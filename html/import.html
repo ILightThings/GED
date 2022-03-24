@@ -1,0 +1,43 @@
+{{define "import"}}
+{{template "header" .}}
+<div>
+<form action="/import-command" method="post">
+    <div class="form-group row">
+        <label for="cred-import" class="col-4 col-form-label">Import Credentials</label>
+        <div class="col-8">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <i class="fa fa-address-card-o"></i>
+                    </div>
+                </div>
+                <input id="cred-import" name="cred-import" type="text" class="form-control">
+            </div>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="offset-4 col-8">
+            <button name="submit" type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+</form>
+</div>
+<div style="border: black;border-style: solid">
+    <form action="/import-blob" method="post">
+    <div class="rendered-form">
+        <div class="formbuilder-textarea form-group field-command-blob">
+            <label for="command-blob" class="formbuilder-textarea-label">Command Blob
+                <br>
+            </label>
+            <textarea type="textarea" class="form-control" name="command-blob" access="false" id="command-blob"></textarea>
+        </div>
+        <div class="formbuilder-button form-group field-SubmitBlob">
+            <button type="submit" class="btn-primary btn" name="SubmitBlob" access="false" style="primary" id="SubmitBlob">Submit Blob
+                <br>
+            </button>
+        </div>
+    </div>
+    </form>
+</div>
+{{end}}
+

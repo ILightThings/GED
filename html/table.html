@@ -1,0 +1,45 @@
+{{define "table"}}
+{{template "header" .}}
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th >ID</th>
+        <th >Actions</th>
+        <th >Command</th>
+        <th>Username</th>
+        <th>Domain</th>
+        <th>Password</th>
+        <th>Hash</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{range .CredEntries}}
+
+    <tr>
+        <td class="small">{{.ID}}
+            <div style="justify-content: right">
+            </div>
+        <td class="small">
+        <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-sm btn-primary"  onclick="window.location.href='/updateID/{{.ID}}'" title="Update Entry">U</button>
+            <button type="button" class="btn btn-sm btn-secondary btn-danger " onclick="window.location.href='/deletecred/{{.ID}}'" title="Delete Entry">D</button>
+
+        </div>
+    </td>
+        <td class="small">
+            <div style="justify-content: right" class="btn-group btn-group-sm ">
+                <button type="button" class="btn  btn-secondary"  onclick="window.location.href='/cme/{{.ID}}'">CME</button>
+                <button type="button" class="btn  btn-secondary " onclick="window.location.href='/imp/{{.ID}}'" >IMP</button>
+            </div>
+        </td>
+        <td >{{.User}}</td>
+        <td >{{.Domain}}</td>
+        <td >{{.Password}}</td>
+        <td >{{.Hash}}</td>
+
+    </tr>
+    {{end}}
+    </tbody>
+</table>
+{{template "footer" . }}
+{{end}}

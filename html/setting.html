@@ -1,0 +1,20 @@
+{{define "settings"}}
+{{template "header" . }}
+<div>
+<button type="button" class="btn btn-danger" onclick="window.location.href='/wipedatabase'">Delete and Build New Database</button>
+</div>
+
+<script>
+    function wipedatabase() {
+        const Http = new XMLHttpRequest();
+        const url = '/wipedatabase?confirm=true';
+        Http.open("GET", url);
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+            window.location.href = "/"
+        }
+    }
+</script>
+{{template "footer" . }}
+{{end}}
