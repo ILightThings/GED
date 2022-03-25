@@ -104,43 +104,70 @@ func CrackmapExecOutput(command string) typelib.CredEntry {
 }
 
 func ImpacketInput(command string) typelib.CredEntry {
-	commandParts := strings.Split(command, " ")
 	var newcred typelib.CredEntry
-	newcred.CommandPattern = "Impacket"
-	for x := range commandParts {
-		if commandParts[x] == "-hashes" {
-			hashinput := strings.Split(commandParts[x+1], ":")
-			if len(hashinput) != 2 {
-				newcred.Hash = hashinput[0]
-			} else {
-				newcred.Hash = hashinput[1]
-			}
+	//Regex Impacket Username and Password if Avail [Hash will need to be Another Regex]
+	// ([A-Za-z0-9.]{1,256}/[A-Za-z0-9]{1,256})(?:(?::)(?:(?:')(\S+)(?:')|(.*?)(?:@))){0,1}
 
-		}
-		if strings.Contains(commandParts[x], "@") && strings.Contains(commandParts[x], "/") {
-			// maybe this is the password part
-			parts := strings.Split(commandParts[x], "/")
-			newcred.Domain = parts[0]
-			if strings.Contains(parts[1], ":") {
-				usernamepassword := strings.Split(parts[1], ":")
-				newcred.User = usernamepassword[0]
+	//Hash Extraction
+	// (?:-hashes (?:[A-Fa-f0-9]{32}){0,1}:)([A-Fa-f0-9]{32})
 
-				// Find password string that have escape sequence with ' character
-				if strings.Count(usernamepassword[1], "'") == 2 {
-					escapedStrings := strings.Split(usernamepassword[1], "'")
-					newcred.Password = escapedStrings[1]
-				} else {
-					newcred.Password = strings.Split(usernamepassword[1], "@")[0]
-				}
+	regexUsernamePass := regexp.MustCompile(`([A-Za-z0-9.]{1,256}/[A-Za-z0-9]{1,256})(?:(?::)(?:(?:')(\S+)(?:')|(.*?)(?:@))){0,1}`)
+	regexHash := regexp.MustCompile(`(?:-hashes (?:[A-Fa-f0-9]{32}){0,1}:)([A-Fa-f0-9]{32})`)
 
-			} else {
-				newcred.User = strings.Split(parts[1], "@")[0]
-			}
+	regexUserDomainPassArray := regexUsernamePass.FindStringSubmatch(command)
+	regexHashArray := regexHash.FindStringSubmatch(command)
 
-		}
+	newcred.User = strings.Split(regexUserDomainPassArray[1], "/")[1]
+	newcred.Domain = strings.Split(regexUserDomainPassArray[1], "/")[0]
 
+	if regexUserDomainPassArray[2] != "" || regexUserDomainPassArray[3] != "" {
+		newcred.Password = regexUserDomainPassArray[2] + regexUserDomainPassArray[3]
 	}
+
+	if len(regexHashArray) != 0 {
+		newcred.Hash = regexHashArray[1]
+	}
+	newcred.CommandPattern = "Impacket"
+
 	return newcred
+
+	//commandParts := strings.Split(command, " ")
+	//
+	//newcred.CommandPattern = "Impacket"
+	//for x := range commandParts {
+	//	if commandParts[x] == "-hashes" {
+	//		hashinput := strings.Split(commandParts[x+1], ":")
+	//		if len(hashinput) != 2 {
+	//			newcred.Hash = hashinput[0]
+	//		} else {
+	//			newcred.Hash = hashinput[1]
+	//		}
+	//
+	//	}
+	//	if strings.Contains(commandParts[x], "@") && strings.Contains(commandParts[x], "/") {
+	//		// maybe this is the password part
+	//		parts := strings.Split(commandParts[x], "/")
+	//		newcred.Domain = parts[0]
+	//		if strings.Contains(parts[1], ":") {
+	//			usernamepassword := strings.Split(parts[1], ":")
+	//			newcred.User = usernamepassword[0]
+	//
+	//			// Find password string that have escape sequence with ' character
+	//			if strings.Count(usernamepassword[1], "'") == 2 {
+	//				escapedStrings := strings.Split(usernamepassword[1], "'")
+	//				newcred.Password = escapedStrings[1]
+	//			} else {
+	//				newcred.Password = strings.Split(usernamepassword[1], "@")[0]
+	//			}
+	//
+	//		} else {
+	//			newcred.User = strings.Split(parts[1], "@")[0]
+	//		}
+	//
+	//	}
+	//
+	//}
+	//return newcred
 }
 func whitespacefix(input string) string {
 	regexWhiteSpace := regexp.MustCompile(`\s{2,}`)

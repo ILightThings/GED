@@ -1,6 +1,6 @@
 {{define "table"}}
 {{template "header" .}}
-<table class="table table-striped">
+<table class="table table-striped" >
     <thead>
     <tr>
         <th >ID</th>
@@ -30,6 +30,7 @@
             <div style="justify-content: right" class="btn-group btn-group-sm ">
                 <button type="button" class="btn  btn-secondary"  onclick="window.location.href='/cme/{{.ID}}'">CME</button>
                 <button type="button" class="btn  btn-secondary " onclick="window.location.href='/imp/{{.ID}}'" >IMP</button>
+                <button type="button" class="btn  btn-secondary " onclick="CookieSet({{.ID}})" >SET</button>
             </div>
         </td>
         <td >{{.User}}</td>
@@ -41,5 +42,16 @@
     {{end}}
     </tbody>
 </table>
+<br>
+<br>
+<script>
+    function CookieSet(id){
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET","/cookie-set/"+id,false);
+        xhttp.send();
+        window.location.href="/creds"
+
+    }
+</script>
 {{template "footer" . }}
 {{end}}

@@ -8,10 +8,10 @@ import (
 
 func TestParseData(t *testing.T) {
 
-	testcmd := "impacket-wmiexec  vecktor.facebook/narration:'aaaaaahhhhhh'@10.0.0.1 -hashes :asdasdasdasdas"
-	credstruct := ParseData(testcmd)
+	testcmd := "bandadasdd  vecktor.facebook/narration:'aaaaaahhhhhh'@10.0.0.1 -hashes :8846F7EAEE8FB117AD06BDD830B7586C"
+	credstruct := ImpacketInput(testcmd)
 
-	expectedHash := "asdasdasdasdas"
+	expectedHash := "8846F7EAEE8FB117AD06BDD830B7586C"
 	expectedDomain := "vecktor.facebook"
 	exepectedUser := "narration"
 	expectedPassword := "aaaaaahhhhhh"

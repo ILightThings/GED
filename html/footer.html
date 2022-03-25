@@ -1,4 +1,81 @@
 {{define "footer" }}
+
+
+<nav class="navbar navbar-expand bg-dark navbar-dark fixed-bottom" >
+    <a class="navbar-brand" >Cmd</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active input-group-sm">
+                <input type="text" class="form-control" id="Footer-Domain-Input"  placeholder="Domain">
+            </li>
+            <li class="nav-item active input-group-sm">
+                <input type="text" class="form-control" id="Footer-User-Input" placeholder="Username">
+            </li>
+            <li class="nav-item active input-group-sm">
+                <input type="text" class="form-control" id="Footer-Password-Input" placeholder="Password">
+            </li>
+            <li class="nav-item active input-group-sm">
+                <input type="text" class="form-control" id="Footer-Hash-Input" placeholder="Hash">
+            </li>
+
+        </ul>
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active input-group-sm">
+                <input type="text" class="form-control" id="Footer-Host-Input"  placeholder="Host">
+            </li>
+        </ul>
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active input-group-sm">
+                <input type="text" class="form-control" id="Footer-Command-Input"  placeholder="Command">
+            </li>
+        </ul>
+<div class="btn-group" role="group">
+            <button class="btn btn-outline-danger my-2 my-sm-0">Clear</button>
+            <button class="btn btn-outline-success my-2 my-sm-0" onclick="Delete_Footer_cookie()">Build</button>
+</div>
+    </div>
+</nav>
+
+<script>
+function Delete_Footer_cookie(){
+    document.cookie = "domain=''; expires=Thu, 18 Dec 2013 12:00:00 UTC";
+    document.cookie = "user=''; expires=Thu, 18 Dec 2013 12:00:00 UTC";
+    document.cookie = "password=''; expires=Thu, 18 Dec 2013 12:00:00 UTC";
+    document.cookie = "hash=''; expires=Thu, 18 Dec 2013 12:00:00 UTC";
+    document.cookie = "host=''; expires=Thu, 18 Dec 2013 12:00:00 UTC";
+    document.cookie = "command=''; expires=Thu, 18 Dec 2013 12:00:00 UTC";
+    document.getElementById("Footer-User-Input").value = "";
+    document.getElementById("Footer-Domain-Input").value = "";
+    document.getElementById("Footer-Password-Input").value = "";
+    document.getElementById("Footer-Hash-Input").value = "";
+    document.getElementById("Footer-Host-Input").value = "";
+    Cookie_To_Footer()
+}
+
+function Cookie_To_Footer(){
+    let output = {};
+    let cookie = document.cookie
+    cookie.split(/\s*;\s*/).forEach(function(pair) {
+        pair = pair.split(/\s*=\s*/);
+
+        output[pair[0]] = pair.splice(1).join('=');
+    });
+    let json = JSON.stringify(output, null, 4);
+    document.getElementById("Footer-User-Input").value = decodeURIComponent(output.user);
+    document.getElementById("Footer-Domain-Input").value = decodeURIComponent(output.domain);
+    document.getElementById("Footer-Password-Input").value = decodeURIComponent(output.password);
+    document.getElementById("Footer-Hash-Input").value = decodeURIComponent(output.hash);
+    document.getElementById("Footer-Host-Input").value = decodeURIComponent(output.host);
+}
+
+window.onload = Cookie_To_Footer()
+</script>
+
+
 </div>
 </body>
 {{end}}

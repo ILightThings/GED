@@ -8,6 +8,7 @@ import (
 	"github.com/ilightthings/GED/transform"
 	"github.com/ilightthings/GED/typelib"
 	_ "github.com/mattn/go-sqlite3"
+	"net/http"
 	"strconv"
 	"strings"
 )
@@ -71,7 +72,8 @@ func main() {
 		if err != nil {
 			c.String(500, "Could not Delete: "+err.Error())
 		} else {
-			c.String(200, "Entry Deleted")
+			c.Redirect(301, "/creds")
+			return
 		}
 
 	})
@@ -154,6 +156,45 @@ func main() {
 	r.GET("/settings", func(c *gin.Context) {
 		data := html.GenerateSettingsPage()
 		c.Data(200, "strings", data)
+
+	})
+
+	r.GET("/creds/json/:id", func(c *gin.Context) {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.String(500, "ID is not a number")
+			return
+		} else {
+			credsEntry, err := mysql.GetCred(sqliteDatabase, id)
+			if err != nil {
+				c.String(500, "Error with SQL:"+err.Error())
+				return
+			}
+			c.JSON(200, credsEntry)
+		}
+
+	})
+	r.GET("/cookie-set/:id", func(c *gin.Context) {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.String(500, "ID is not a number")
+			return
+		} else {
+			credsEntry, err := mysql.GetCred(sqliteDatabase, id)
+			if err != nil {
+				c.String(500, "Error with SQL:"+err.Error())
+				return
+			}
+			c.Header("Cache-Control", "no-store")
+			c.SetCookie("user", credsEntry.User, 10000, "", "", false, false)
+			c.SetCookie("domain", credsEntry.Domain, 10000, "", "", false, false)
+			c.SetCookie("password", credsEntry.Password, 10000, "", "", false, false)
+			c.SetCookie("hash", credsEntry.Hash, 10000, "", "", false, false)
+			c.SetSameSite(http.SameSite(http.SameSiteDefaultMode))
+
+			c.String(200, "Yeah that worked")
+
+		}
 
 	})
 
