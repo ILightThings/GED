@@ -9,10 +9,14 @@ import (
 	"log"
 )
 
-func GenerateImportPage() []byte {
+func GenerateImportPage(db *sql.DB) []byte {
 	var htmtBuffer bytes.Buffer
+	pageData, err := GenerateGeneral(db)
+	if err != nil {
+		log.Fatal(err)
+	}
 	var template = template.Must(template.ParseFiles("html/header.html", "html/import.html", "html/footer.html"))
-	err := template.ExecuteTemplate(&htmtBuffer, "import", nil)
+	err = template.ExecuteTemplate(&htmtBuffer, "import", pageData)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -22,33 +26,15 @@ func GenerateImportPage() []byte {
 }
 
 func GenerateCredsTable(db *sql.DB) []byte {
-	var page typelib.PageEntries
-	var htmtBuffer bytes.Buffer
-
-	rows, err := db.Query("SELECT idCred,username,domain,password,hash FROM creds")
-	defer rows.Close()
+	page, err := GenerateGeneral(db)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	for rows.Next() {
-		var cred typelib.CredEntry
-		var id int
-		var us string
-		var do string
-		var pa string
-		var ha string
-		rows.Scan(&id, &us, &do, &pa, &ha)
-
-		cred.ID = id
-		cred.User = us
-		cred.Domain = do
-		cred.Password = pa
-		cred.Hash = ha
-
-		page.CredEntries = append(page.CredEntries, cred)
-
+	page.CredEntries, err = mysql.GetCredTableSQLEntries(db)
+	if err != nil {
+		log.Fatal(err)
 	}
+	var htmtBuffer bytes.Buffer
 
 	//
 	//
@@ -92,4 +78,22 @@ func GenerateSettingsPage() []byte {
 		log.Fatal(err)
 	}
 	return htmtBuffer.Bytes()
+}
+
+func GenerateGeneral(db *sql.DB) (typelib.PageEntries, error) {
+	var pageData typelib.PageEntries
+	var err error
+	pageData.CommanderBar, err = mysql.GetCommandBarEntry(db)
+	if err != nil {
+		return pageData, err
+	}
+
+	data, err := mysql.GetCommandLib(db)
+	pageData.CommandList = data.ListOfCommands
+	if err != nil {
+		return pageData, err
+	}
+
+	return pageData, nil
+
 }

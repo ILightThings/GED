@@ -8,7 +8,6 @@ import (
 	"github.com/ilightthings/GED/transform"
 	"github.com/ilightthings/GED/typelib"
 	_ "github.com/mattn/go-sqlite3"
-	"net/http"
 	"strconv"
 	"strings"
 )
@@ -21,7 +20,7 @@ func main() {
 	r := gin.Default()
 	r.LoadHTMLFiles("html/import.html")
 	r.GET("/", func(c *gin.Context) {
-		c.Data(200, "string", html.GenerateImportPage())
+		c.Data(200, "string", html.GenerateImportPage(sqliteDatabase))
 	})
 
 	r.POST("/import-command", func(c *gin.Context) {
@@ -174,27 +173,60 @@ func main() {
 		}
 
 	})
-	r.GET("/cookie-set/:id", func(c *gin.Context) {
+	r.GET("/SetCred/:id", func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			c.String(500, "ID is not a number")
 			return
 		} else {
+			currentBar, err := mysql.GetCommandBarEntry(sqliteDatabase)
+			if err != nil {
+				c.String(500, "Error with SQL:"+err.Error())
+				return
+			}
+
 			credsEntry, err := mysql.GetCred(sqliteDatabase, id)
 			if err != nil {
 				c.String(500, "Error with SQL:"+err.Error())
 				return
 			}
-			c.Header("Cache-Control", "no-store")
-			c.SetCookie("user", credsEntry.User, 10000, "", "", false, false)
-			c.SetCookie("domain", credsEntry.Domain, 10000, "", "", false, false)
-			c.SetCookie("password", credsEntry.Password, 10000, "", "", false, false)
-			c.SetCookie("hash", credsEntry.Hash, 10000, "", "", false, false)
-			c.SetSameSite(http.SameSite(http.SameSiteDefaultMode))
 
-			c.String(200, "Yeah that worked")
+			currentBar.User = credsEntry.User
+			currentBar.Domain = credsEntry.Domain
+			currentBar.Password = credsEntry.Password
+			currentBar.Hash = credsEntry.Hash
+
+			err = mysql.SetCredBarEntry(sqliteDatabase, currentBar)
+			if err != nil {
+				c.String(500, "Error with SQL:"+err.Error())
+				return
+			}
+
+			c.String(200, "It worked!")
 
 		}
+
+	})
+
+	r.POST("/creds/execute", func(c *gin.Context) {
+		var passedCommands typelib.CommandBar
+		var newCommand typelib.CommandBuild
+		passedCommands.User = c.PostForm("footer-user")
+		passedCommands.Password = c.PostForm("footer-password")
+		passedCommands.Domain = c.PostForm("footer-domain")
+		passedCommands.Hash = c.PostForm("footer-hash")
+		passedCommands.Host = c.PostForm("footer-host")
+		passedCommands.Command = c.PostForm("command")
+		newCommand.Command = c.PostForm("command")
+
+		err := mysql.SetCredBarEntry(sqliteDatabase, passedCommands)
+		if err != nil {
+			c.String(500, err.Error())
+			return
+		}
+		result := newCommand.BuildCommand(passedCommands)
+		c.String(200, result)
+		return
 
 	})
 

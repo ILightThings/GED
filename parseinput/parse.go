@@ -279,3 +279,11 @@ func IdentifyCMEline(data []string) typelib.PageEntries {
 func lsassyParse(data []string) {
 	fmt.Println()
 }
+
+// NETNTLMV2 Hashe
+// ^(([^\\\\\\/:*?\"<>|]{1,20}\\\\)?[^\\\\\\/:*?\"<>|]{1,20}[:]{2,3})([^\\\\\\/:*?\"<>|]{1,20}:)?[^\\\\\\/:*?\"<>|]{1,20}:[A-Za-f0-9]{32}:[A-Za-f0-9]+$
+
+// Crackmapexec Host Info Regex
+// (?:(\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}).+(?:\[\S\]\s([^(]+)\s\((name:([^)]+)?)(?:[.+\(\)\s]+)(domain:([^)]+)?)(?:[\)\(\s]+)(signing:(?:True|False)))(?:[\)\(\s]+)(SMBv1:(?:True|False))(?:[\s\)]+)(\(.+\))?)
+
+//

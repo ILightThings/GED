@@ -1,44 +1,39 @@
 {{define "footer" }}
 
 
-<nav class="navbar navbar-expand bg-dark navbar-dark fixed-bottom" >
-    <a class="navbar-brand" >Cmd</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active input-group-sm">
-                <input type="text" class="form-control" id="Footer-Domain-Input"  placeholder="Domain">
-            </li>
-            <li class="nav-item active input-group-sm">
-                <input type="text" class="form-control" id="Footer-User-Input" placeholder="Username">
-            </li>
-            <li class="nav-item active input-group-sm">
-                <input type="text" class="form-control" id="Footer-Password-Input" placeholder="Password">
-            </li>
-            <li class="nav-item active input-group-sm">
-                <input type="text" class="form-control" id="Footer-Hash-Input" placeholder="Hash">
-            </li>
+    <form action="/creds/execute" method="post">
+        <div class="fixed-bottom row align-items-center g-6 bg-dark p-3" >
+        <div class="col-auto">
+                <input type="text" name="footer-domain" class="form-control" id="Footer-Domain-Input" value="{{ .CommanderBar.Domain}}" placeholder="Domain">
+        </div>
+            <div class="col-auto">
+                <input type="text" name="footer-user" class="form-control" id="Footer-User-Input" value="{{ .CommanderBar.User}}" placeholder="Username">
+            </div>
+            <div class="col-auto">
+                <input type="text" name="footer-password" class="form-control" id="Footer-Password-Input" value="{{ .CommanderBar.Password}}" placeholder="Password">
+            </div>
+            <div class="col-auto">
+                <input type="text" name="footer-hash" class="form-control" id="Footer-Hash-Input" value="{{ .CommanderBar.Hash}}" placeholder="Hash">
+        </div>
+            <div class="col-auto">
+                <input type="text" name="footer-host" class="form-control" id="Footer-Host-Input" value="{{ .CommanderBar.Host}}"  placeholder="Host">
+            </div>
 
-        </ul>
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active input-group-sm">
-                <input type="text" class="form-control" id="Footer-Host-Input"  placeholder="Host">
-            </li>
-        </ul>
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active input-group-sm">
-                <input type="text" class="form-control" id="Footer-Command-Input"  placeholder="Command">
-            </li>
-        </ul>
-<div class="btn-group" role="group">
-            <button class="btn btn-outline-danger my-2 my-sm-0">Clear</button>
-            <button class="btn btn-outline-success my-2 my-sm-0" onclick="Delete_Footer_cookie()">Build</button>
+        <div class="col-auto">
+               <select name="command" id="Footer-Command-input">
+               {{ range .CommandList }}
+                   <option value="{{ .Command }}">{{ .Display }}</option>
+                   {{end}}
+               </select>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Build</button>
+        </div>
+        </div>
+
 </div>
-    </div>
-</nav>
+    </form>
 
 <script>
 function Delete_Footer_cookie(){
@@ -72,7 +67,7 @@ function Cookie_To_Footer(){
     document.getElementById("Footer-Host-Input").value = decodeURIComponent(output.host);
 }
 
-window.onload = Cookie_To_Footer()
+
 </script>
 
 

@@ -30,7 +30,7 @@
             <div style="justify-content: right" class="btn-group btn-group-sm ">
                 <button type="button" class="btn  btn-secondary"  onclick="window.location.href='/cme/{{.ID}}'">CME</button>
                 <button type="button" class="btn  btn-secondary " onclick="window.location.href='/imp/{{.ID}}'" >IMP</button>
-                <button type="button" class="btn  btn-secondary " onclick="CookieSet({{.ID}})" >SET</button>
+                <button type="button" class="btn  btn-secondary " onclick="CredSet('{{.ID}}')" >SET</button>
             </div>
         </td>
         <td >{{.User}}</td>
@@ -45,11 +45,13 @@
 <br>
 <br>
 <script>
-    function CookieSet(id){
+    function CredSet(id){
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET","/cookie-set/"+id,false);
+        xhttp.open("GET","/SetCred/"+id,false);
         xhttp.send();
-        window.location.href="/creds"
+        window.location.href='/creds'
+
+
 
     }
 </script>

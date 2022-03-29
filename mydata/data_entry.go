@@ -1,5 +1,6 @@
 package mydata
 
+// STOP USING THIS YOU FUCK
 import (
 	"encoding/json"
 	"errors"
