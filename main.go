@@ -14,8 +14,8 @@ import (
 
 func main() {
 
-	//sqliteDatabase := mysql.MakeNewDatabase()
-	sqliteDatabase := mysql.OpenDatabase()
+	sqliteDatabase := mysql.MakeNewDatabase()
+	//sqliteDatabase := mysql.OpenDatabase()
 
 	r := gin.Default()
 	r.LoadHTMLFiles("html/import.html")
@@ -153,7 +153,7 @@ func main() {
 	})
 
 	r.GET("/settings", func(c *gin.Context) {
-		data := html.GenerateSettingsPage()
+		data := html.GenerateSettingsPage(sqliteDatabase)
 		c.Data(200, "strings", data)
 
 	})

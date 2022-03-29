@@ -70,16 +70,18 @@ func GenerateCredUpdate(db *sql.DB, id int) ([]byte, error) {
 
 }
 
-func GenerateSettingsPage() []byte {
+func GenerateSettingsPage(db *sql.DB) []byte {
 	var htmtBuffer bytes.Buffer
+	pageData, _ := GenerateGeneral(db)
 	var template = template.Must(template.ParseFiles("html/header.html", "html/setting.html", "html/footer.html"))
-	err := template.ExecuteTemplate(&htmtBuffer, "settings", nil)
+	err := template.ExecuteTemplate(&htmtBuffer, "settings", pageData)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return htmtBuffer.Bytes()
 }
 
+//Generate the command bar and command list from SQL list
 func GenerateGeneral(db *sql.DB) (typelib.PageEntries, error) {
 	var pageData typelib.PageEntries
 	var err error
