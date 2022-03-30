@@ -2,6 +2,7 @@ package parseinput
 
 import (
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/go-cmp/cmp"
 	"github.com/ilightthings/GED/typelib"
 	"regexp"
@@ -54,35 +55,36 @@ func CrackMapExecInput(command string) (typelib.CredEntry, typelib.HostEntry) {
 		if len(regexArray) < 2 {
 			continue
 		} else {
-			if x == "Host" {
-
-				// TODO this is so stupid. Either do it properly or be laughed at. -Self
-				dots := strings.Count(regexArray[1], ".")
-				switch dots {
-				case 3:
+			switch x {
+			case "User":
+				newcred.User = regexArray[1]
+			case "Domain":
+				newcred.Domain = regexArray[1]
+			case "Password":
+				//Regex captures 2 capture groups. One should be nil. Maybe clean this up a bit.
+				newcred.Password = regexArray[1] + regexArray[2]
+			case "Hash":
+				newcred.Hash = regexArray[1]
+			case "Host":
+				v := validator.New()
+				if err := v.Var(regexArray[1], "ip"); err == nil {
 					newHost.IP = regexArray[1]
-				case 2:
+					continue
+				}
+				if err := v.Var(regexArray[1], "fqdn"); err == nil {
 					newHost.FQDN = regexArray[1]
-				default:
+					continue
+				}
+				if err := v.Var(regexArray[1], "hostname"); err == nil {
 					newHost.Hostname = regexArray[1]
+					continue
 				}
-			} else {
-				switch x {
-				case "User":
-					newcred.User = regexArray[1]
-				case "Domain":
-					newcred.Domain = regexArray[1]
-				case "Password":
-					newcred.Password = regexArray[1] + regexArray[2]
-				case "Hash":
-					newcred.Hash = regexArray[1]
 
-				}
 			}
-
 		}
 
 	}
+
 	newcred.CommandPattern = "Crackmapexec Input"
 	return newcred, newHost
 }

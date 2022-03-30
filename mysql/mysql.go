@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/ilightthings/GED/inital"
 	"github.com/ilightthings/GED/typelib"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
@@ -16,12 +17,8 @@ func FreshInstall(db *sql.DB) {
 	createCommandBar(db)
 	createCommandTable(db)
 	var begin typelib.CommandLibrary
-	jsonbytes, err := os.ReadFile("default/commands.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-	begin.ImportFromJson(jsonbytes)
-	err = InsertCommandIntoLib(db, begin)
+	begin.ImportFromJson(inital.Commands)
+	err := InsertCommandIntoLib(db, begin)
 	if err != nil {
 		log.Fatal(err)
 	}

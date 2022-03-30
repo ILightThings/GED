@@ -1,5 +1,6 @@
 {{define "import"}}
 {{template "header" .}}
+<div class="p-5">
 <div>
 <form action="/import-command" method="post">
     <div class="form-group row">
@@ -22,7 +23,7 @@
     </div>
 </form>
 </div>
-<div style="border: black;border-style: solid">
+<div>
     <form action="/import-blob" method="post">
     <div class="rendered-form">
         <div class="formbuilder-textarea form-group field-command-blob">
@@ -35,9 +36,11 @@
             <button type="submit" class="btn-primary btn" name="SubmitBlob" access="false" style="primary" id="SubmitBlob">Submit Blob
                 <br>
             </button>
+            <a>Currently supports: Crackmapexec output, secretsdump output.</a>
         </div>
     </div>
     </form>
+</div>
 </div>
 {{template "footer" .}}
 {{end}}

@@ -1,10 +1,10 @@
 {{define "table"}}
 {{template "header" .}}
-<table class="table table-striped" >
+<table class="table table-striped table-bordered table-bordered" style="table-layout: fixed;word-wrap: break-word">
     <thead>
     <tr>
-        <th>ID</th>
-        <th>Actions</th>
+        <th style="width: min-content">ID</th>
+        <th style="width: min-content">Actions</th>
         <th>IP</th>
         <th>Hostname</th>
         <th>FQDN</th>
@@ -26,23 +26,28 @@
             </div>
         </td>
         <td >
+            {{if .IP}}
+            <a href="#" onclick="HostSet({{.IP}})">
             {{.IP}}
-            <div style="justify-content: right" class="btn-group btn-group-sm ">
-            <button type="button" class="btn  btn-secondary " onclick="HostSet('{{.IP}}')" >SET</button>
-        </div>
+            </a>
+
+            {{end}}
 
         </td>
         <td >
-            {{.Hostname}}
-            <div style="justify-content: right" class="btn-group btn-group-sm ">
-            <button type="button" class="btn  btn-secondary " onclick="HostSet('{{.Hostname}}')" >SET</button>
-        </div>
+            {{ if .Hostname}}
+            <a href="#" onclick="HostSet({{ .Hostname}})">
+                {{ .Hostname}}
+            </a>
+
+            {{end}}
             </td>
         <td >
-            {{.FQDN}}
-            <div style="justify-content: right" class="btn-group btn-group-sm ">
-            <button type="button" class="btn  btn-secondary " onclick="HostSet('{{.FQDN}}')" >SET</button>
-        </div>
+            {{if .FQDN}}
+            <a href="#" onclick="HostSet({{.FQDN}})">
+                {{.FQDN}}
+            </a>
+            {{end}}
 
         </td>
         <td >{{.Admins}}</td>
@@ -56,7 +61,7 @@
 <script>
     function HostSet(id){
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET","/SetHost/"+id,false);
+        xhttp.open("GET","/setHost/"+id,false);
         xhttp.send();
         window.location.href='/hosts'
     }

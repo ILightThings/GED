@@ -3,31 +3,37 @@
 
 
     <form action="/creds/execute" method="post">
-        <div class="fixed-bottom row align-items-center g-6 bg-dark p-3" >
+        <div class="fixed-bottom row align-items-center g-6 bg-dark pb-3 pl-3 pr-3" >
         <div class="col-auto">
+            <label for="Footer-Domain-Input" class="text-white">Domain</label>
                 <input type="text" name="footer-domain" class="form-control" id="Footer-Domain-Input" value="{{ .CommanderBar.Domain}}" placeholder="Domain">
         </div>
             <div class="col-auto">
+                <label for="Footer-User-Input" class="text-white">Username</label>
                 <input type="text" name="footer-user" class="form-control" id="Footer-User-Input" value="{{ .CommanderBar.User}}" placeholder="Username">
             </div>
             <div class="col-auto">
+                <label for="Footer-Password-Input" class="text-white">Password</label>
                 <input type="text" name="footer-password" class="form-control" id="Footer-Password-Input" value="{{ .CommanderBar.Password}}" placeholder="Password">
             </div>
             <div class="col-auto">
+                <label for="Footer-Hash-Input" class="text-white">Hash</label>
                 <input type="text" name="footer-hash" class="form-control" id="Footer-Hash-Input" value="{{ .CommanderBar.Hash}}" placeholder="Hash">
         </div>
             <div class="col-auto">
+                <label for="Footer-Host-Input" class="text-white">Host</label>
                 <input type="text" name="footer-host" class="form-control" id="Footer-Host-Input" value="{{ .CommanderBar.Host}}"  placeholder="Host">
             </div>
 
         <div class="col-auto">
-               <select name="command" id="Footer-Command-input">
+
+               <select name="command" id="Footer-Command-input" class="mt-3">
                {{ range .CommandList }}
                    <option value="{{ .Command }}">{{ .Display }}</option>
                    {{end}}
                </select>
         </div>
-        <div class="col-auto">
+        <div class="col-auto mt-3">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Build</button>
         </div>
         </div>
@@ -35,40 +41,6 @@
 </div>
     </form>
 
-<script>
-function Delete_Footer_cookie(){
-    document.cookie = "domain=''; expires=Thu, 18 Dec 2013 12:00:00 UTC";
-    document.cookie = "user=''; expires=Thu, 18 Dec 2013 12:00:00 UTC";
-    document.cookie = "password=''; expires=Thu, 18 Dec 2013 12:00:00 UTC";
-    document.cookie = "hash=''; expires=Thu, 18 Dec 2013 12:00:00 UTC";
-    document.cookie = "host=''; expires=Thu, 18 Dec 2013 12:00:00 UTC";
-    document.cookie = "command=''; expires=Thu, 18 Dec 2013 12:00:00 UTC";
-    document.getElementById("Footer-User-Input").value = "";
-    document.getElementById("Footer-Domain-Input").value = "";
-    document.getElementById("Footer-Password-Input").value = "";
-    document.getElementById("Footer-Hash-Input").value = "";
-    document.getElementById("Footer-Host-Input").value = "";
-    Cookie_To_Footer()
-}
-
-function Cookie_To_Footer(){
-    let output = {};
-    let cookie = document.cookie
-    cookie.split(/\s*;\s*/).forEach(function(pair) {
-        pair = pair.split(/\s*=\s*/);
-
-        output[pair[0]] = pair.splice(1).join('=');
-    });
-    let json = JSON.stringify(output, null, 4);
-    document.getElementById("Footer-User-Input").value = decodeURIComponent(output.user);
-    document.getElementById("Footer-Domain-Input").value = decodeURIComponent(output.domain);
-    document.getElementById("Footer-Password-Input").value = decodeURIComponent(output.password);
-    document.getElementById("Footer-Hash-Input").value = decodeURIComponent(output.hash);
-    document.getElementById("Footer-Host-Input").value = decodeURIComponent(output.host);
-}
-
-
-</script>
 
 
 </div>

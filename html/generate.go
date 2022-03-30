@@ -15,7 +15,7 @@ func GenerateImportPage(db *sql.DB) []byte {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var template = template.Must(template.ParseFiles("html/header.html", "html/import.html", "html/footer.html"))
+	var template = template.Must(template.ParseFS(HTML, "header.html", "import.html", "footer.html"))
 	err = template.ExecuteTemplate(&htmtBuffer, "import", pageData)
 	if err != nil {
 		log.Fatal(err)
@@ -44,7 +44,7 @@ func GenerateCredsTable(db *sql.DB) []byte {
 	//}
 	//tabletempl.Execute(&htmtBuffer, page)
 
-	var template = template.Must(template.ParseFiles("html/header.html", "html/credtable.html", "html/footer.html"))
+	var template = template.Must(template.ParseFS(HTML, "header.html", "credtable.html", "footer.html"))
 	err = template.ExecuteTemplate(&htmtBuffer, "table", page)
 	if err != nil {
 		log.Fatal(err)
@@ -56,32 +56,45 @@ func GenerateCredsTable(db *sql.DB) []byte {
 
 func GenerateCredUpdate(db *sql.DB, id int) ([]byte, error) {
 	var html bytes.Buffer
-	updateTempl, err := template.ParseFiles("html/updateCred.html")
+	updateTempl, err := template.ParseFS(HTML, "header.html", "updateCred.html", "footer.html")
 	if err != nil {
 		return html.Bytes(), err
 	}
-	data, err := mysql.GetCred(db, id)
+	pagedata, err := GenerateGeneral(db)
+	if err != nil {
+		return nil, err
+	}
+	pagedata.CredUpdate, err = mysql.GetCred(db, id)
 	if err != nil {
 		return html.Bytes(), err
 	}
 
-	updateTempl.Execute(&html, data)
+	err = updateTempl.ExecuteTemplate(&html, "updateCred", pagedata)
+	if err != nil {
+		return nil, err
+	}
+
 	return html.Bytes(), nil
 
 }
 
 func GenerateHostUpdate(db *sql.DB, id int) ([]byte, error) {
 	var html bytes.Buffer
-	updateTempl, err := template.ParseFiles("html/updateHost.html")
+	pagedata, err := GenerateGeneral(db)
+	//updateTempl, err := template.ParseFiles("html/updateHost.html")
+	updateTempl, err := template.ParseFS(HTML, "updateHost.html", "header.html", "footer.html")
 	if err != nil {
 		return html.Bytes(), err
 	}
-	data, err := mysql.GetHost(db, id)
+	pagedata.HostUpdate, err = mysql.GetHost(db, id)
 	if err != nil {
 		return html.Bytes(), err
 	}
 
-	updateTempl.Execute(&html, data)
+	err = updateTempl.ExecuteTemplate(&html, "updateHost", pagedata)
+	if err != nil {
+		return nil, err
+	}
 	return html.Bytes(), nil
 
 }
@@ -89,7 +102,7 @@ func GenerateHostUpdate(db *sql.DB, id int) ([]byte, error) {
 func GenerateSettingsPage(db *sql.DB) []byte {
 	var htmtBuffer bytes.Buffer
 	pageData, _ := GenerateGeneral(db)
-	var template = template.Must(template.ParseFiles("html/header.html", "html/setting.html", "html/footer.html"))
+	var template = template.Must(template.ParseFS(HTML, "header.html", "setting.html", "footer.html"))
 	err := template.ExecuteTemplate(&htmtBuffer, "settings", pageData)
 	if err != nil {
 		log.Fatal(err)
@@ -116,7 +129,7 @@ func GenerateHostTable(db *sql.DB) ([]byte, error) {
 	//}
 	//tabletempl.Execute(&htmtBuffer, page)
 
-	var template = template.Must(template.ParseFiles("html/header.html", "html/hosttable.html", "html/footer.html"))
+	var template = template.Must(template.ParseFS(HTML, "header.html", "hosttable.html", "footer.html"))
 	err = template.ExecuteTemplate(&htmtBuffer, "table", page)
 	if err != nil {
 		log.Fatal(err)

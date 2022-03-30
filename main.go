@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/ilightthings/GED/html"
@@ -8,14 +9,15 @@ import (
 	"github.com/ilightthings/GED/parseinput"
 	"github.com/ilightthings/GED/typelib"
 	_ "github.com/mattn/go-sqlite3"
+	"os"
 	"strconv"
 	"strings"
 )
 
 func main() {
 
-	//sqliteDatabase := mysql.MakeNewDatabase()
-	sqliteDatabase := mysql.OpenDatabase()
+	var sqliteDatabase *sql.DB
+	sqliteDatabase = initalizeSQL()
 
 	r := gin.Default()
 	r.LoadHTMLFiles("html/import.html")
@@ -133,7 +135,7 @@ func main() {
 			c.String(500, "Could not update Database Entry "+err.Error())
 			return
 		} else {
-			c.String(200, "Entry Updated")
+			c.String(200, "Entry Updated.")
 			return
 		}
 
@@ -226,7 +228,7 @@ func main() {
 		c.Data(200, "string", data)
 	})
 
-	r.GET("/SetHost/:id", func(c *gin.Context) {
+	r.GET("/setHost/:id", func(c *gin.Context) {
 		hostString := c.Param("id")
 		currentBar, err := mysql.GetCommandBarEntry(sqliteDatabase)
 		if err != nil {
@@ -302,4 +304,13 @@ func main() {
 	})
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+}
+
+func initalizeSQL() *sql.DB {
+	if sqldbfile, err := os.Open("sqlite-database.db"); err != nil {
+		return mysql.MakeNewDatabase()
+	} else {
+		sqldbfile.Close()
+		return mysql.OpenDatabase()
+	}
 }

@@ -12,6 +12,8 @@ type PageEntries struct {
 	CommanderBar CommandBar
 	CommandList  []CommandBuild
 	HostEntries  []HostEntry
+	CredUpdate   CredEntry
+	HostUpdate   HostEntry
 }
 
 type CommandBar struct {

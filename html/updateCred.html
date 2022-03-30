@@ -1,35 +1,37 @@
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-<div class="p-5 ">
-<form action="/updateID/{{.ID}}" method="post" class="p-4 border border-primary rounded">
+{{define "updateCred"}}
+
+{{template "header" .}}
+
+<div class="p-5 " style="overflow-y: auto">
+<form action="/updateID/{{.CredUpdate.ID}}" method="post" class="p-4">
     <div class="form-group row">
         <label class="col-4 col-form-label" for="ID">ID</label>
         <div class="col-8">
-            <input id="ID" name="ID" type="text" class="form-control" disabled value="{{.ID}}">
+            <input id="ID" name="ID" type="text" class="form-control" disabled value="{{.CredUpdate.ID}}">
         </div>
     </div>
     <div class="form-group row">
         <label for="username" class="col-4 col-form-label">User Name</label>
         <div class="col-8">
-            <input id="username" name="user" type="text" class="form-control" value="{{.User}}">
+            <input id="username" name="user" type="text" class="form-control" value="{{ .CredUpdate.User}}">
         </div>
     </div>
     <div class="form-group row">
         <label for="domain" class="col-4 col-form-label">Domain</label>
         <div class="col-8">
-            <input id="domain" name="domain" type="text" class="form-control" value="{{.Domain}}">
+            <input id="domain" name="domain" type="text" class="form-control" value="{{ .CredUpdate.Domain}}">
         </div>
     </div>
     <div class="form-group row">
         <label for="password" class="col-4 col-form-label">Password</label>
         <div class="col-8">
-            <input id="password" name="password" type="text" class="form-control" value="{{.Password}}">
+            <input id="password" name="password" type="text" class="form-control" value="{{ .CredUpdate.Password}}">
         </div>
     </div>
     <div class="form-group row">
         <label for="hash" class="col-4 col-form-label">Hash</label>
         <div class="col-8">
-            <input id="hash" name="hash" type="text" class="form-control" value="{{.Hash}}">
+            <input id="hash" name="hash" type="text" class="form-control" value="{{ .CredUpdate.Hash}}">
         </div>
     </div>
     <div class="form-group row">
@@ -39,3 +41,5 @@
     </div>
 </form>
 </div>
+{{template "footer" . }}
+{{end}}

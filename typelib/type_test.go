@@ -7,7 +7,7 @@ import (
 
 func TestCommandLibrary_ImportFromJson(t *testing.T) {
 	var testlib CommandLibrary
-	jsonfile, err := os.ReadFile("default/commands.json")
+	jsonfile, err := os.ReadFile("inital/commands.json")
 	if err != nil || jsonfile == nil {
 		t.Error(err.Error())
 	}
