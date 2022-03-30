@@ -1,0 +1,65 @@
+{{define "table"}}
+{{template "header" .}}
+<table class="table table-striped" >
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Actions</th>
+        <th>IP</th>
+        <th>Hostname</th>
+        <th>FQDN</th>
+        <th>Admins</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{range .HostEntries}}
+
+    <tr>
+        <td class="small">{{.ID}}
+            <div style="justify-content: right">
+            </div>
+        <td class="small">
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-sm btn-primary"  onclick="window.location.href='/updateHost/{{.ID}}'" title="Update Entry">U</button>
+                <button type="button" class="btn btn-sm btn-secondary btn-danger " onclick="window.location.href='/deleteHost/{{.ID}}'" title="Delete Entry">D</button>
+
+            </div>
+        </td>
+        <td >
+            {{.IP}}
+            <div style="justify-content: right" class="btn-group btn-group-sm ">
+            <button type="button" class="btn  btn-secondary " onclick="HostSet('{{.IP}}')" >SET</button>
+        </div>
+
+        </td>
+        <td >
+            {{.Hostname}}
+            <div style="justify-content: right" class="btn-group btn-group-sm ">
+            <button type="button" class="btn  btn-secondary " onclick="HostSet('{{.Hostname}}')" >SET</button>
+        </div>
+            </td>
+        <td >
+            {{.FQDN}}
+            <div style="justify-content: right" class="btn-group btn-group-sm ">
+            <button type="button" class="btn  btn-secondary " onclick="HostSet('{{.FQDN}}')" >SET</button>
+        </div>
+
+        </td>
+        <td >{{.Admins}}</td>
+
+    </tr>
+    {{end}}
+    </tbody>
+</table>
+<br>
+<br>
+<script>
+    function HostSet(id){
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET","/SetHost/"+id,false);
+        xhttp.send();
+        window.location.href='/hosts'
+    }
+</script>
+{{template "footer" . }}
+{{end}}

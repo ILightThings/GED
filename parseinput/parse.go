@@ -2,57 +2,89 @@ package parseinput
 
 import (
 	"fmt"
+	"github.com/google/go-cmp/cmp"
 	"github.com/ilightthings/GED/typelib"
 	"regexp"
 	"strings"
 )
 
-func ParseData(command string) typelib.CredEntry {
+func ParseData(command string) (typelib.CredEntry, typelib.HostEntry) {
 	commandParts := strings.Split(command, " ")
 	var newcred typelib.CredEntry
+	var newhost typelib.HostEntry
 	newcred.CommandReference = command
 
 	//Parse impacket command
 	// "impacket-wmiexec  vecktor.facebook/narration:'aaaaaahhhhhh'@10.0.0.1 -hashes :asdasdasdasdas"
 	if strings.Contains(commandParts[0], "impacket") {
-		newcred = ImpacketInput(command)
-		return newcred
+		newcred, newhost = ImpacketInput(command)
+		return newcred, newhost
 	}
 
 	//Parse CrackMapExec command
 	if strings.Contains(commandParts[0], "crackmapexec") || strings.Contains(commandParts[0], "cme") {
-		newcred = CrackMapExecInput(command)
-		return newcred
+
+		newcred, newhost = CrackMapExecInput(command)
+		return newcred, newhost
 	}
 
 	if commandParts[0] == "SMB" {
 		newcred = CrackmapExecOutput(command)
-		return newcred
+		return newcred, newhost
 
 	}
 
-	return typelib.CredEntry{}
+	return newcred, newhost
 }
 
-func CrackMapExecInput(command string) typelib.CredEntry {
-	commandParts := strings.Split(command, " ")
+func CrackMapExecInput(command string) (typelib.CredEntry, typelib.HostEntry) {
 	var newcred typelib.CredEntry
-	newcred.CommandPattern = "Crackmapexec Input"
-	for x := range commandParts {
-		if commandParts[x] == "-u" {
-			newcred.User = commandParts[x+1]
+	var newHost typelib.HostEntry
+
+	RegexLibary := map[string]string{}
+	RegexLibary["Host"] = `(?:(?:mssql|ldap|smb|ssh)\s([^\s]+))`
+	RegexLibary["User"] = `(?:-u\s([^\s]+)\s?)`
+	RegexLibary["Domain"] = `(?:-d\s([^\s]+)\s)`
+	RegexLibary["Password"] = `(?:-p\s(?:'([^']+)|([^\s]+)))`
+	RegexLibary["Hash"] = `(?:-H\s([A-Fa-f0-9]{32}))`
+
+	for x, y := range RegexLibary {
+		runRegex := regexp.MustCompile(y)
+		regexArray := runRegex.FindStringSubmatch(command)
+		if len(regexArray) < 2 {
+			continue
+		} else {
+			if x == "Host" {
+
+				// TODO this is so stupid. Either do it properly or be laughed at. -Self
+				dots := strings.Count(regexArray[1], ".")
+				switch dots {
+				case 3:
+					newHost.IP = regexArray[1]
+				case 2:
+					newHost.FQDN = regexArray[1]
+				default:
+					newHost.Hostname = regexArray[1]
+				}
+			} else {
+				switch x {
+				case "User":
+					newcred.User = regexArray[1]
+				case "Domain":
+					newcred.Domain = regexArray[1]
+				case "Password":
+					newcred.Password = regexArray[1] + regexArray[2]
+				case "Hash":
+					newcred.Hash = regexArray[1]
+
+				}
+			}
+
 		}
-		if commandParts[x] == "-p" {
-			newcred.Password = commandParts[x+1]
-		}
-		if commandParts[x] == "-H" {
-			newcred.Hash = commandParts[x+1]
-		}
-		if commandParts[x] == "-d" {
-			newcred.Domain = commandParts[x+1]
-		}
+
 	}
-	return newcred
+	newcred.CommandPattern = "Crackmapexec Input"
+	return newcred, newHost
 }
 
 func CrackmapExecOutput(command string) typelib.CredEntry {
@@ -103,8 +135,9 @@ func CrackmapExecOutput(command string) typelib.CredEntry {
 
 }
 
-func ImpacketInput(command string) typelib.CredEntry {
+func ImpacketInput(command string) (typelib.CredEntry, typelib.HostEntry) {
 	var newcred typelib.CredEntry
+	var newhost typelib.HostEntry
 	//Regex Impacket Username and Password if Avail [Hash will need to be Another Regex]
 	// ([A-Za-z0-9.]{1,256}/[A-Za-z0-9]{1,256})(?:(?::)(?:(?:')(\S+)(?:')|(.*?)(?:@))){0,1}
 
@@ -112,24 +145,39 @@ func ImpacketInput(command string) typelib.CredEntry {
 	// (?:-hashes (?:[A-Fa-f0-9]{32}){0,1}:)([A-Fa-f0-9]{32})
 
 	regexUsernamePass := regexp.MustCompile(`([A-Za-z0-9.]{1,256}/[A-Za-z0-9]{1,256})(?:(?::)(?:(?:')(\S+)(?:')|(.*?)(?:@))){0,1}`)
-	regexHash := regexp.MustCompile(`(?:-hashes (?:[A-Fa-f0-9]{32}){0,1}:)([A-Fa-f0-9]{32})`)
-
 	regexUserDomainPassArray := regexUsernamePass.FindStringSubmatch(command)
-	regexHashArray := regexHash.FindStringSubmatch(command)
-
 	newcred.User = strings.Split(regexUserDomainPassArray[1], "/")[1]
 	newcred.Domain = strings.Split(regexUserDomainPassArray[1], "/")[0]
 
+	// This will set the password if it is surrounded by single quotes or not.
 	if regexUserDomainPassArray[2] != "" || regexUserDomainPassArray[3] != "" {
 		newcred.Password = regexUserDomainPassArray[2] + regexUserDomainPassArray[3]
 	}
 
+	regexHash := regexp.MustCompile(`(?:-hashes (?:[A-Fa-f0-9]{32}){0,1}:)([A-Fa-f0-9]{32})`)
+	regexHashArray := regexHash.FindStringSubmatch(command)
 	if len(regexHashArray) != 0 {
 		newcred.Hash = regexHashArray[1]
 	}
+
+	// Hostname, FQDN, IP
+	regexHost := regexp.MustCompile(`(?:[^/\s]+/.*@([^\s]+)[\s\n])`)
+	regexHostArray := regexHost.FindStringSubmatch(command)
+	if len(regexHostArray) > 0 {
+		dots := strings.Count(regexHostArray[1], ".")
+		switch dots {
+		case 3:
+			newhost.IP = regexHostArray[1]
+		case 2:
+			newhost.FQDN = regexHostArray[1]
+		default:
+			newhost.Hostname = regexHostArray[1]
+		}
+	}
+
 	newcred.CommandPattern = "Impacket"
 
-	return newcred
+	return newcred, newhost
 
 	//commandParts := strings.Split(command, " ")
 	//
@@ -182,16 +230,48 @@ func IdentifyBlob(input string) {
 		//process
 	}
 }
+func extractCMEOutHost(line string) typelib.HostEntry {
+	var foundhost typelib.HostEntry
+	hostRegexLine := `(?:[\s]+(\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})\s+(?:445|139)\s+([^\s]+))`
+	hostRegex := regexp.MustCompile(hostRegexLine)
+	hostarry := hostRegex.FindStringSubmatch(line)
+	if len(hostarry) != 3 {
+		return foundhost
+	} else {
+		foundhost.IP = hostarry[1]
+		foundhost.Hostname = hostarry[2]
+		return foundhost
+	}
+}
 
-func IdentifyCMEline(data []string) typelib.PageEntries {
-	var creds typelib.PageEntries
+func IdentifyCMEline(data []string) ([]typelib.CredEntry, []typelib.HostEntry) {
+	var creds []typelib.CredEntry
+	var hosts []typelib.HostEntry
 	RegexLibary := map[string]string{}
 	RegexLibary["SecretsDump/NTDS Dump/SamDump"] = `([A-zÀ-ú0-9.]{1,256})(?::[[:digit:]]{1,5}:)(?:[A-Fa-f0-9]{32})(?::)([A-Fa-f0-9]{32})(?::{3})`
 	RegexLibary["Lsassy Hash"] = `(?:\s)([A-zÀ-ú0-9.]{1,256}\\[A-zÀ-ú0-9]{1,256})(?:\s)([A-Fa-f0-9]{32})`
 	RegexLibary["Lsassy Password"] = `(?:\s)([A-zÀ-ú0-9.]{1,256}\\[A-zÀ-ú0-9]{1,256})(?:\s)(\S{1,256})`
 	RegexLibary["Crackmapexec Hash Input"] = `(?:(\[\S\])\s)([A-zÀ-ú0-9.]{1,256}\\[A-zÀ-ú0-9]{1,256})(?::)([A-Fa-f0-9]{32})`
 	RegexLibary["Crackmapexec Password Input"] = `(?:\[\S\]\s)([A-zÀ-ú0-9.]{1,256}\\[A-zÀ-ú0-9]{1,256})(?::)(\S{1,256})`
+
 	for x := range data {
+		hostline := extractCMEOutHost(data[x])
+		err := hostline.Verify()
+		if err == nil {
+
+			//Small Check to find unique hosts entries
+			v := 0
+			for x := range hosts {
+				if cmp.Equal(hosts[x], hostline) {
+					v++
+				}
+			}
+			if v == 0 {
+				hosts = append(hosts, hostline)
+			}
+
+		}
+
 		for _, y := range RegexLibary {
 			var newcred typelib.CredEntry
 			re := regexp.MustCompile(y)
@@ -208,7 +288,7 @@ func IdentifyCMEline(data []string) typelib.PageEntries {
 				ipRegex := regexp.MustCompile(`(?:\s)([0-2]{0,1}[0-9]{0,1}[0-9]{1}\.[0-2]{0,1}[0-9]{0,1}[0-9]{1}\.[0-2]{0,1}[0-9]{0,1}[0-9]{1}\.[0-2]{0,1}[0-9]{0,1}[0-9]{1})`)
 				ipDomain := ipRegex.FindStringSubmatch(data[x])
 				if len(ipDomain) != 0 {
-					//Right Most IP Address, typicall the crackmapexec target
+					//Right Most IP Address, typicall the crackmapexec target.. Unless your using a module.....
 					newcred.Domain = ipDomain[len(ipDomain)-1]
 				}
 				newcred.User = result_slice[1]
@@ -220,11 +300,11 @@ func IdentifyCMEline(data []string) typelib.PageEntries {
 			} else {
 				newcred.Password = result_slice[2]
 			}
-			creds.CredEntries = append(creds.CredEntries, newcred)
+			creds = append(creds, newcred)
 		}
 	}
 
-	return creds
+	return creds, hosts
 	//case "lsassy":
 	//	lsassyParse(data)
 	//	//REGEX NTML ([A-Za-z0-9\\.]{3,}\s[A-Za-z0-9]{32}\n)

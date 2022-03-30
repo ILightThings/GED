@@ -128,7 +128,7 @@ func createHostsTable(db *sql.DB) {
 	log.Println("Hosts table created")
 }
 
-func InsertCreds(db *sql.DB, username string, domain string, password string, hash string) string {
+func InsertCreds(db *sql.DB, entry typelib.CredEntry) string {
 	log.Println("Inserting Creds record ...")
 	insertStudentSQL := `INSERT INTO creds(username, domain, password,hash) VALUES (?, ?, ?, ?)`
 	statement, err := db.Prepare(insertStudentSQL) // Prepare statement.
@@ -136,7 +136,7 @@ func InsertCreds(db *sql.DB, username string, domain string, password string, ha
 	if err != nil {
 		return err.Error()
 	}
-	_, err = statement.Exec(username, domain, password, hash)
+	_, err = statement.Exec(entry.User, entry.Domain, entry.Password, entry.Hash)
 	if err != nil {
 		return err.Error()
 	}
@@ -374,11 +374,12 @@ func InsertCommandIntoLib(db *sql.DB, commandLib typelib.CommandLibrary) error {
 	for x := range commandLib.ListOfCommands {
 		insertSQL := `INSERT INTO commands(templateString,displayString,exampleString) VALUES (?,?,?)`
 		statement, err := db.Prepare(insertSQL) // Prepare statement.
+		defer statement.Close()
 		// This is good to avoid SQL injections
 		if err != nil {
 			return err
 		}
-		defer statement.Close()
+
 		_, err = statement.Exec(commandLib.ListOfCommands[x].Command,
 			commandLib.ListOfCommands[x].Display,
 			commandLib.ListOfCommands[x].Example)
@@ -395,7 +396,7 @@ func GetCommandLib(db *sql.DB) (typelib.CommandLibrary, error) {
 	rows, err := db.Query("SELECT templateString,displayString,exampleString FROM commands ORDER BY displayString")
 	defer rows.Close()
 	if err != nil {
-		log.Fatal(err)
+		return typelib.CommandLibrary{}, err
 	}
 
 	for rows.Next() {
@@ -413,6 +414,116 @@ func GetCommandLib(db *sql.DB) (typelib.CommandLibrary, error) {
 
 	}
 	return entries, nil
+}
+
+func InsertHost(db *sql.DB, hostEntry typelib.HostEntry) error {
+	log.Println("Inserting Creds record ...")
+	insertHostSQL := `INSERT INTO hosts(ip, hostname, fqdn,usersAdmin) VALUES (?, ?, ?, ?)`
+	statement, err := db.Prepare(insertHostSQL) // Prepare statement.
+	defer statement.Close()
+	// This is good to avoid SQL injections
+	if err != nil {
+		return err
+	}
+	_, err = statement.Exec(hostEntry.IP, hostEntry.Hostname, hostEntry.FQDN, hostEntry.Admins)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetHostList(db *sql.DB) ([]typelib.HostEntry, error) {
+	var hostlists []typelib.HostEntry
+	rows, err := db.Query("SELECT idHost,ip,fqdn,hostname,usersAdmin FROM hosts")
+	defer rows.Close()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var host typelib.HostEntry
+		var id int
+		var ip string
+		var fqdn string
+		var hostname string
+		var userAdmin string
+		rows.Scan(&id, &ip, &fqdn, &hostname, &userAdmin)
+
+		host.ID = id
+		host.IP = ip
+		host.FQDN = fqdn
+		host.Hostname = hostname
+		host.Admins = userAdmin
+
+		hostlists = append(hostlists, host)
+
+	}
+	return hostlists, nil
+}
+
+func DeleteHost(db *sql.DB, ID int) error {
+	deleteStudentSQL := `DELETE FROM hosts WHERE idHost = (?)`
+	statement, err := db.Prepare(deleteStudentSQL)
+	defer statement.Close()
+	if err != nil {
+		return err
+	}
+	_, err = statement.Exec(ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetHost(db *sql.DB, ID int) (typelib.HostEntry, error) {
+	var entry typelib.HostEntry
+	query := `SELECT idHost,IP,FQDN,Hostname FROM hosts WHERE idHost = (?)`
+	statement, err := db.Prepare(query)
+	defer statement.Close()
+	rows, err := statement.Query(ID)
+	defer rows.Close()
+
+	if err != nil {
+		return entry, err
+	}
+	// Make sure entry is not zero
+	i := 0
+	for rows.Next() {
+		i++
+		var idHost int
+		var IP string
+		var FQDN string
+		var Hostname string
+		rows.Scan(&idHost, &IP, &FQDN, &Hostname)
+		entry.ID = idHost
+		entry.IP = IP
+		entry.FQDN = FQDN
+		entry.Hostname = Hostname
+
+		return entry, nil
+	}
+	if i == 0 {
+		return entry, errors.New("no entries found")
+	}
+	return entry, errors.New("could not build cred object")
+
+}
+
+func UpdateHost(db *sql.DB, entry typelib.HostEntry) error {
+	// TODO implement history
+	updateCommand := `UPDATE hosts SET IP = ?,FQDN = ?,Hostname = ? WHERE idHost = ?`
+	updateStatement, err := db.Prepare(updateCommand)
+	defer updateStatement.Close()
+	if err != nil {
+		return err
+	}
+	_, err = updateStatement.Exec(entry.IP, entry.FQDN, entry.Hostname, entry.ID)
+
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 //Command

@@ -11,6 +11,7 @@ type PageEntries struct {
 	CredEntries  []CredEntry
 	CommanderBar CommandBar
 	CommandList  []CommandBuild
+	HostEntries  []HostEntry
 }
 
 type CommandBar struct {
@@ -43,6 +44,14 @@ type CredEntry struct {
 	CommandPattern   string
 	UsedAgainst      []string
 	Parsed           bool
+}
+
+type HostEntry struct {
+	ID       int
+	IP       string
+	Hostname string
+	FQDN     string
+	Admins   string
 }
 
 func (u *CredEntry) StringCreds() string {
@@ -105,4 +114,29 @@ func (comlib *CommandLibrary) ImportFromJson(cmdJson []byte) error {
 	comlib.ListOfCommands = commandLib
 	return nil
 
+}
+
+func (h *HostEntry) Verify() error {
+	{
+		value := 0
+		if h.IP != "" {
+			value++
+		}
+		if h.FQDN != "" {
+			value++
+		}
+		if h.Hostname != "" {
+			value++
+		}
+
+		if value >= 1 {
+			return nil
+		} else {
+			return errors.New("Empty Entry")
+		}
+	}
+}
+
+func (h *HostEntry) StringHost() string {
+	return fmt.Sprintf("IP: \"%s\", FQDN: \"%s\", Hostname: \"%s\", Admin: \"%s\"", h.IP, h.FQDN, h.Hostname, h.Admins)
 }
