@@ -1,6 +1,6 @@
 Great Engagement Database
 
- A tool to keep me organized.
+A tool to keep me organized and convert my creds from one format to another. The executable is self contained, and will only write a database for persistant data. Run the executable anywhere.
 
 
 ## Database
@@ -29,11 +29,11 @@ Hosts:
 
 Mysql:
 - [ ] Implement Duplicate Checking
-  - Maybe add a hash check where all coloums are concated and md5 hash is created. Compare will all coloums....
+  (Maybe add a hash check where all coloums are concated and md5 hash is created. Compare will all coloums....)
 - [ ] Custom SQL Database Location
 
 Frontend:
 - [ ] Remake import page
 
 Codebase:
-- [ ] implement embeded file system
+- [x] implement embeded file system

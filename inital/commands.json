@@ -6,6 +6,11 @@
           "example":"smbmap -u terry -p password123 -d light.local -H 192.168.0.1"
         },
         {
+          "command":"smbmap -u ##USER## -p ##HASH## -d ##DOMAIN## -H ##HOST##",
+          "display":"SMB Map[H]",
+          "example":"smbmap -u terry -p A9FDFA038C4B75EBC76DC855DD74F0DA -d light.local -H 192.168.0.1"
+        },
+        {
           "command":"crackmapexec smb ##HOST## -u ##USER## -p '##PASSWORD##' -d ##DOMAIN##  ",
           "display":"CrackMapExec",
           "example":"crackmapexec smb 192.168.0.1 -u terry -p 'password123' -d light.local"
@@ -32,44 +37,54 @@
           "display":"Impacket wmiexec",
           "example":"impacket-wmiexec light.local/terry:'password123'@192.168.0.1"
         },
-    {
-      "command": "impacket-wmiexec ##DOMAIN##/##USER##:@##HOST## -hashes :##HASH##",
-      "display": "Impacket wmiexec[H]",
-      "example": "impacket-wmiexec light.local/terry@192.168.0.1 -hashes :A9FDFA038C4B75EBC76DC855DD74F0DA"
-    },
-    {
-      "command": "runas /user:##DOMAIN##\\##USER## cmd ",
-      "display": "runas",
-      "example": "runas /user:light.local\\terry cmd"
-    },
-    {
-      "command": "nmap ##HOST## -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=##DOMAIN##,smbusername=##USER##,smbpassword=##PASSWORD##'",
-      "display": "nmap enum shares",
-      "example": "nmap 192.168.0.1 -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=light.local,smbusername=terry,smbpassword=password123"
-    },
-    {
-      "command": "nmap ##HOST## -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=##DOMAIN##,smbusername=##USER##,smbhash=##HASH##'",
-      "display": "nmap enum shares[H]",
-      "example": "nmap 192.168.0.1 -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=light.local,smbusername=terry,smbhash=A9FDFA038C4B75EBC76DC855DD74F0DA"
-    },
-    {
-      "command": "impacket-smbclient ##DOMAIN##/##USER##:'##PASSWORD##'@##HOST##",
-      "display": "Impacket smbclient",
-      "example": "impacket-smbclient light.local/terry:'password123'@192.168.0.1"
-    },
-    {
-      "command": "impacket-smbclient ##DOMAIN##/##USER##:@##HOST## -hashes :##HASH##",
-      "display": "Impacket smbclient[H]",
-      "example": "impacket-smbclient light.local/terry@192.168.0.1 -hashes :A9FDFA038C4B75EBC76DC855DD74F0DA"
-    },
-    {
-      "command": "Username:\n##DOMAIN##\\##USER##\n\nPassword:\n##PASSWORD##",
-      "display": "Windows Prompt",
-      "example": "Username:\nlight.local\\terry\n\nPassword:\npassword123"
-    },
-    {
-      "command": "$SecPassword = ConvertTo-SecureString '##PASSWORD##' -AsPlainText -force\n$Cred = New-Object System.Management.Automation.PSCredential('##DOMAIN##\\##USER##', $SecPassword)\n$Cred",
-      "display": "[PS]Generate Secure Creds",
-      "example": "$SecPassword = ConvertTo-SecureString 'password123' -AsPlainText -force\n$Cred = New-Object System.Management.Automation.PSCredential('light.local\\terry', $SecPassword\n$Cred"
-    }
+        {
+          "command": "impacket-wmiexec ##DOMAIN##/##USER##:@##HOST## -hashes :##HASH##",
+          "display": "Impacket wmiexec[H]",
+          "example": "impacket-wmiexec light.local/terry@192.168.0.1 -hashes :A9FDFA038C4B75EBC76DC855DD74F0DA"
+        },
+        {
+          "command": "runas /user:##DOMAIN##\\##USER## cmd ",
+          "display": "runas",
+          "example": "runas /user:light.local\\terry cmd"
+        },
+        {
+          "command": "nmap ##HOST## -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=##DOMAIN##,smbusername=##USER##,smbpassword=##PASSWORD##'",
+          "display": "nmap enum shares",
+          "example": "nmap 192.168.0.1 -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=light.local,smbusername=terry,smbpassword=password123"
+        },
+        {
+          "command": "nmap ##HOST## -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=##DOMAIN##,smbusername=##USER##,smbhash=##HASH##'",
+          "display": "nmap enum shares[H]",
+          "example": "nmap 192.168.0.1 -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=light.local,smbusername=terry,smbhash=A9FDFA038C4B75EBC76DC855DD74F0DA"
+        },
+        {
+          "command": "impacket-smbclient ##DOMAIN##/##USER##:'##PASSWORD##'@##HOST##",
+          "display": "Impacket smbclient",
+          "example": "impacket-smbclient light.local/terry:'password123'@192.168.0.1"
+        },
+        {
+          "command": "impacket-smbclient ##DOMAIN##/##USER##:@##HOST## -hashes :##HASH##",
+          "display": "Impacket smbclient[H]",
+          "example": "impacket-smbclient light.local/terry@192.168.0.1 -hashes :A9FDFA038C4B75EBC76DC855DD74F0DA"
+        },
+        {
+          "command": "Username:\n##DOMAIN##\\##USER##\n\nPassword:\n##PASSWORD##",
+          "display": "Windows Prompt",
+          "example": "Username:\nlight.local\\terry\n\nPassword:\npassword123"
+        },
+        {
+          "command": "$SecPassword = ConvertTo-SecureString '##PASSWORD##' -AsPlainText -force\n$Cred = New-Object System.Management.Automation.PSCredential('##DOMAIN##\\##USER##', $SecPassword)\n$Cred",
+          "display": "[PS] Generate Secure Creds",
+          "example": "$SecPassword = ConvertTo-SecureString 'password123' -AsPlainText -force\n$Cred = New-Object System.Management.Automation.PSCredential('light.local\\terry', $SecPassword\n$Cred"
+        },
+        {
+          "command": "net user /add ##USER## ##PASSWORD## /Y ",
+          "display": "[CMD] Net Create User",
+          "example": "net user /add terry password123 /Y"
+        },
+        {
+          "command": "net user /add ##USER## ##PASSWORD## /Y && net localgroup administrators /add ##USER## ",
+          "display": "[CMD] Net Create Local Admin",
+          "example": "net user /add terry password123 /Y && net localgroup administrators /add terry /Y"
+        }
   ]

@@ -1,9 +1,9 @@
 {{define "footer" }}
 
 
-
+<div class="fixed-bottom">
     <form action="/creds/execute" method="post">
-        <div class="fixed-bottom row align-items-center g-6 bg-dark pb-3 pl-3 pr-3" >
+        <div class=" row align-items-center g-6 bg-dark pb-3 pl-3 pr-3" >
         <div class="col-auto">
             <label for="Footer-Domain-Input" class="text-white">Domain</label>
                 <input type="text" name="footer-domain" class="form-control" id="Footer-Domain-Input" value="{{ .CommanderBar.Domain}}" placeholder="Domain">
@@ -40,9 +40,8 @@
 
 </div>
     </form>
-
-
-
 </div>
+
+
 </body>
 {{end}}
