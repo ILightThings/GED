@@ -75,6 +75,9 @@ func (u *CredEntry) StringCreds() string {
 func (u *CredEntry) Verify() error {
 	value := 0
 	if u.User != "" {
+		if u.User != "" {
+			u.User = escapeString(u.User)
+		}
 		value = value + 2
 	}
 	if u.Domain != "" {
@@ -82,9 +85,7 @@ func (u *CredEntry) Verify() error {
 	}
 	if u.Password != "" || u.Hash != "" {
 		if u.Password != "" {
-			if u.Password[0] == '\'' && u.Password[len(u.Password)-1] == '\'' {
-				u.Password = u.Password[1 : len(u.Password)-2]
-			}
+			u.Password = escapeString(u.Password)
 		}
 		value = value + 1
 	}
@@ -158,4 +159,8 @@ func (h *HostEntry) Verify() error {
 
 func (h *HostEntry) StringHost() string {
 	return fmt.Sprintf("IP: \"%s\", FQDN: \"%s\", Hostname: \"%s\", Admin: \"%s\"", h.IP, h.FQDN, h.Hostname, h.Admins)
+}
+
+func escapeString(thestring string) string {
+	return strings.Trim(thestring, "'")
 }
