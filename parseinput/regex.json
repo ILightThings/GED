@@ -1,0 +1,23 @@
+[
+  {
+    "PatternID":"LM\\NTLM Hash",
+    "RegexPattern":'(?:[a-fA-F0-9]{32}):([a-fA-F0-9]{32})',
+    "Example": "aad3b435b51404eeaad3b435b51404ee:13AABE228FD78DC98AA99421F19D7727",
+    "Captures": ["Hash"],
+    "Description": "LM\\NTLM Hash"
+  },
+  {
+    "PatternID":"NTLM Hash",
+    "RegexPattern":'(?::)([a-fA-F0-9]{32})',
+    "Example": ":13AABE228FD78DC98AA99421F19D7727 or 13AABE228FD78DC98AA99421F19D7727 ",
+    "Captures": ["Hash"],
+    "Description": "NTLM Hash "
+  },
+  {
+    "PatternID":"Standard Tags",
+    "RegexPattern":'',
+    "Example": "",
+    "Captures": [""]
+  }
+
+]

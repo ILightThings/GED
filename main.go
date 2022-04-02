@@ -27,7 +27,11 @@ func main() {
 
 	r.POST("/import-command", func(c *gin.Context) {
 		command := c.PostForm("cred-import")
-		newcred, newhost := parseinput.ParseData(command)
+		newcred, newhost, err3 := parseinput.ExtractCommandData(command)
+		if err3 != nil {
+			c.String(500, "Error with host insert:\n "+err3.Error())
+			return
+		}
 		err := newcred.Verify()
 		err2 := newhost.Verify()
 

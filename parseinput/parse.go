@@ -17,13 +17,13 @@ func ParseData(command string) (typelib.CredEntry, typelib.HostEntry) {
 
 	//Parse impacket command
 	// "impacket-wmiexec  vecktor.facebook/narration:'aaaaaahhhhhh'@10.0.0.1 -hashes :asdasdasdasdas"
-	if strings.Contains(commandParts[0], "impacket") {
+	if strings.Contains(command, "impacket") {
 		newcred, newhost = ImpacketInput(command)
 		return newcred, newhost
 	}
 
 	//Parse CrackMapExec command
-	if strings.Contains(commandParts[0], "crackmapexec") || strings.Contains(commandParts[0], "cme") {
+	if strings.Contains(command, "crackmapexec") || strings.Contains(command, "cme") {
 
 		newcred, newhost = CrackMapExecInput(command)
 		return newcred, newhost
@@ -146,8 +146,8 @@ func ImpacketInput(command string) (typelib.CredEntry, typelib.HostEntry) {
 	//Hash Extraction
 	// (?:-hashes (?:[A-Fa-f0-9]{32}){0,1}:)([A-Fa-f0-9]{32})
 
-	regexUsernamePass := regexp.MustCompile(`([A-Za-z0-9.]{1,256}/[A-Za-z0-9]{1,256})(?:(?::)(?:(?:')(\S+)(?:')|(.*?)(?:@))){0,1}`)
-	regexUserDomainPassArray := regexUsernamePass.FindStringSubmatch(command)
+	regexUserDomainPass := regexp.MustCompile(`([^/\s]{1,256}/[^\:s]{1,256})(?:(?::)(?:(?:')(\S+)(?:')|(.*?)(?:@))){0,1}`)
+	regexUserDomainPassArray := regexUserDomainPass.FindStringSubmatch(command)
 	newcred.User = strings.Split(regexUserDomainPassArray[1], "/")[1]
 	newcred.Domain = strings.Split(regexUserDomainPassArray[1], "/")[0]
 
@@ -156,7 +156,7 @@ func ImpacketInput(command string) (typelib.CredEntry, typelib.HostEntry) {
 		newcred.Password = regexUserDomainPassArray[2] + regexUserDomainPassArray[3]
 	}
 
-	regexHash := regexp.MustCompile(`(?:-hashes (?:[A-Fa-f0-9]{32}){0,1}:)([A-Fa-f0-9]{32})`)
+	regexHash := regexp.MustCompile(`(?:-hashes (?:[A-Fa-f0-9]{32})?:)([A-Fa-f0-9]{32})`)
 	regexHashArray := regexHash.FindStringSubmatch(command)
 	if len(regexHashArray) != 0 {
 		newcred.Hash = regexHashArray[1]
@@ -250,7 +250,7 @@ func IdentifyCMEline(data []string) ([]typelib.CredEntry, []typelib.HostEntry) {
 	var creds []typelib.CredEntry
 	var hosts []typelib.HostEntry
 	RegexLibary := map[string]string{}
-	RegexLibary["SecretsDump/NTDS Dump/SamDump"] = `([A-zÀ-ú0-9.]{1,256})(?::[[:digit:]]{1,5}:)(?:[A-Fa-f0-9]{32})(?::)([A-Fa-f0-9]{32})(?::{3})`
+	RegexLibary["SecretsDump/NTDS Dump/SamDump"] = `([^:\s]{1,256})(?::[[:digit:]]{1,5}:)(?:[A-Fa-f0-9]{32})(?::)([A-Fa-f0-9]{32})(?::{3})`
 	RegexLibary["Lsassy Hash"] = `(?:\s)([A-zÀ-ú0-9.]{1,256}\\[A-zÀ-ú0-9]{1,256})(?:\s)([A-Fa-f0-9]{32})`
 	RegexLibary["Lsassy Password"] = `(?:\s)([A-zÀ-ú0-9.]{1,256}\\[A-zÀ-ú0-9]{1,256})(?:\s)(\S{1,256})`
 	RegexLibary["Crackmapexec Hash Input"] = `(?:(\[\S\])\s)([A-zÀ-ú0-9.]{1,256}\\[A-zÀ-ú0-9]{1,256})(?::)([A-Fa-f0-9]{32})`

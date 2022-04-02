@@ -56,6 +56,18 @@ type HostEntry struct {
 	Admins   string
 }
 
+type ParseOptionsCred struct {
+	UserList     []string
+	PasswordList []string
+	HashList     []string
+	DomainList   []string
+}
+
+type RegexEntry []struct {
+	PatternID    string
+	RegexPattern string
+}
+
 func (u *CredEntry) StringCreds() string {
 	return fmt.Sprintf("User: \"%s\", Domain: \"%s\", Password: \"%s\", Hash: \"%s\", Command Pattern: \"%s\"", u.User, u.Domain, u.Password, u.Hash, u.CommandPattern)
 }
@@ -69,6 +81,11 @@ func (u *CredEntry) Verify() error {
 		value = value + 1
 	}
 	if u.Password != "" || u.Hash != "" {
+		if u.Password != "" {
+			if u.Password[0] == '\'' && u.Password[len(u.Password)-1] == '\'' {
+				u.Password = u.Password[1 : len(u.Password)-2]
+			}
+		}
 		value = value + 1
 	}
 

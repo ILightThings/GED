@@ -1,0 +1,69 @@
+[
+  {
+    "CommandName": "smbmap",
+    "Alias": ["smbmap","smbmap.py"],
+    "ParseType": "args",
+    "CommandMatch": [
+      ["-H", "host"],
+      ["-u", "user"],
+      ["-p", "password"],
+      ["-d", "domain"]
+    ]
+  },
+  {
+    "CommandName": "crackmapexec",
+    "Alias": ["cme","crackmapexec"],
+    "ParseType": "args",
+    "CommandMatch": [
+      ["-H", "hash"],
+      ["-u", "user"],
+      ["-p", "password"],
+      ["-d", "domain"],
+      ["smb", "host"],
+      ["ldap", "host"],
+      ["mssql", "host"],
+      ["ssh", "host"]
+    ]
+  },
+  {
+    "CommandName": "crackmapexec",
+    "Alias": ["cme","crackmapexec"],
+    "ParseType": "args",
+    "CommandMatch": [
+      ["-H", "hash"],
+      ["-u", "user"],
+      ["-p", "password"],
+      ["-d", "domain"],
+      ["smb", "host"],
+      ["ldap", "host"],
+      ["mssql", "host"],
+      ["ssh", "host"]
+    ]
+  },
+  {
+    "CommandName": "msfconsole",
+    "Alias": ["msfconsole"],
+    "ParseType": "args",
+    "CommandMatch": [
+      ["smbuser", "user"],
+      ["smbdomain", "domain"],
+      ["smbpass", "password"],
+      ["smbhash", "hash"],
+      ["rhosts", "host"]
+    ]
+  },
+  {
+    "CommandName": "impacket ToolKit",
+    "Alias": ["Get-GPPPassword.py","GetADUsers.py","GetNPUsers.py","GetUserSPNs.py","addcomputer.py","atexec.py","dcomexec.py","dpapi.py","dpapi.py","esentutl.py","exchanger.py","findDelegation.py","getArch.py","getPac.py","getST.py","getTGT.py","goldenPac.py","karmaSMB.py","kintercept.py","lookupsid.py","machine_role.py","mimikatz.py","mqtt_check.py","mssqlclient.py","mssqlinstance.py","netview.py","nmapAnswerMachine.py","ntfs-read.py","ntlmrelayx.py","ping.py","ping6.py","psexec.py","raiseChild.py","rbcd.py","remove duplicate code in rbcd.py","rdp_check.py","reg.py","registry-read.py","rpcdump.py","rpcmap.py","sambaPipe.py","samrdump.py","secretsdump.py","services.py","smbclient.py","smbexec.py","smbpasswd.py","smbrelayx.py","smbserver.py","sniff.py","sniffer.py","split.py","ticketConverter.py","ticketer.py","wmiexec.py","wmipersist.py","wmiquery.py","impacket-Get-GPPPassword","impacket-GetADUsers","impacket-GetNPUsers","impacket-GetUserSPNs","impacket-addcomputer","impacket-atexec","impacket-dcomexec","impacket-dpapi","impacket-dpapi","impacket-esentutl","impacket-exchanger","impacket-findDelegation","impacket-getArch","impacket-getPac","impacket-getST","impacket-getTGT","impacket-goldenPac","impacket-karmaSMB","impacket-kintercept","impacket-lookupsid","impacket-machine_role","impacket-mimikatz","impacket-mqtt_check","impacket-mssqlclient","impacket-mssqlinstance","impacket-netview","impacket-nmapAnswerMachine","impacket-ntfs-read","impacket-ntlmrelayx","impacket-ping","impacket-ping6","impacket-psexec","impacket-raiseChild","impacket-rbcd","impacket-removeduplicatecodeinrbcd","impacket-rdp_check","impacket-reg","impacket-registry-read","impacket-rpcdump","impacket-rpcmap","impacket-sambaPipe","impacket-samrdump","impacket-secretsdump","impacket-services","impacket-smbclient","impacket-smbexec","impacket-smbpasswd","impacket-smbrelayx","impacket-smbserver","impacket-sniff","impacket-sniffer","impacket-split","impacket-ticketConverter","impacket-ticketer","impacket-wmiexec","impacket-wmipersist","impacket-wmiquery"],
+    "ParseType": "regex",
+    "CommandMatch": [
+     ["(?:[^'] (?P<domain>[^/\\s]+)/)","domain"],
+      ["(?:/(?P<user>[^:@\\s]+)[^@:]?)","user"],
+      ["(?:/[^ ]+:(?P<password>[^@\\s]+))","password"],
+      ["(?:-hashes [a-fA-F0-9]?:([a-fA-F0-9]{32}))", "hash"],
+      ["(?:@(?P<host>[^\\s]+))","host"]
+    ]
+  }
+
+
+]
