@@ -8,16 +8,9 @@ import (
 	"strings"
 )
 
-type CommandTemplate []struct {
-	CommandName  string     `json:"CommandName"`
-	Alias        []string   `json:"Alias"`
-	ParseType    string     `json:"ParseType"`
-	CommandMatch [][]string `json:"CommandMatch"`
-}
-
-func GenerateCommandTemplate() (CommandTemplate, error) {
+func GenerateCommandTemplate() (typelib.CommandTemplate, error) {
 	// TODO store in SQL
-	var commandsDB CommandTemplate
+	var commandsDB typelib.CommandTemplate
 
 	err := json.Unmarshal(inital.InputCommandJson, &commandsDB)
 	if err != nil {

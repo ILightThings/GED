@@ -68,6 +68,13 @@ type RegexEntry []struct {
 	RegexPattern string
 }
 
+type CommandTemplate []struct {
+	CommandName  string     `json:"CommandName"`
+	Alias        []string   `json:"Alias"`
+	ParseType    string     `json:"ParseType"`
+	CommandMatch [][]string `json:"CommandMatch"`
+}
+
 func (u *CredEntry) StringCreds() string {
 	return fmt.Sprintf("User: \"%s\", Domain: \"%s\", Password: \"%s\", Hash: \"%s\", Command Pattern: \"%s\"", u.User, u.Domain, u.Password, u.Hash, u.CommandPattern)
 }
@@ -81,6 +88,9 @@ func (u *CredEntry) Verify() error {
 		value = value + 2
 	}
 	if u.Domain != "" {
+		if u.Domain != "" {
+			u.Domain = escapeString(u.Domain)
+		}
 		value = value + 1
 	}
 	if u.Password != "" || u.Hash != "" {
