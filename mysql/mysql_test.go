@@ -3,6 +3,7 @@ package mysql
 import (
 	"github.com/ilightthings/GED/typelib"
 	"math/rand"
+	"os"
 	"testing"
 	"time"
 )
@@ -52,4 +53,24 @@ func TestGetCommandBarEntry(t *testing.T) {
 	if len(entry.User) != 32 {
 		t.Errorf("username is not 32 chars long. Username: %s\n", entry.User)
 	}
+}
+
+func TestFreshInstall(t *testing.T) {
+	os.Remove("./sqlite-database.db")
+	sql := OpenDatabase()
+	err := FreshInstall(sql)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	table, err := RetreiveParseTable(sql)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if table.Array[0].CommandName != "smbmap" {
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+	}
+
 }

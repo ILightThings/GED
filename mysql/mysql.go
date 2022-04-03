@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/ilightthings/GED/inital"
@@ -11,17 +12,27 @@ import (
 	"os"
 )
 
-func FreshInstall(db *sql.DB) {
+func FreshInstall(db *sql.DB) error {
 	createCredTable(db)
 	createHostsTable(db)
 	createCommandBar(db)
 	createCommandTable(db)
+	createCommandParseTable(db)
 	var begin typelib.CommandLibrary
 	begin.ImportFromJson(inital.Commands)
 	err := InsertCommandIntoLib(db, begin)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	initalParseDB, err := inital.GenerateCommandTemplate()
+	if err != nil {
+		return err
+	}
+	err = InsertCommandParseTable(db, initalParseDB)
+	if err != nil {
+		return err
+	}
+	return nil
 
 }
 
@@ -38,7 +49,11 @@ func MakeNewDatabase() *sql.DB {
 
 	sqliteDatabase := OpenDatabase()
 
-	FreshInstall(sqliteDatabase)
+	err = FreshInstall(sqliteDatabase)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return sqliteDatabase
 }
 
@@ -125,8 +140,85 @@ func createHostsTable(db *sql.DB) {
 	log.Println("Hosts table created")
 }
 
+func createCommandParseTable(db *sql.DB) {
+	createCommandTableSQL := `CREATE TABLE command_parse (
+    	"idParse" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+		"cmdDisplay" Text,		
+		"alias" BLOB,
+		"parseType" TEXT,
+		"commandMatch" BLOB	
+	  );`
+
+	statement, err := db.Prepare(createCommandTableSQL) // Pregolanpare SQL Statement
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	statement.Exec() // Execute SQL Statements
+}
+
+func InsertCommandParseTable(db *sql.DB, cmdObject typelib.CommandParseDB) error {
+	for x := range cmdObject.Array {
+
+		sqlQuery := `INSERT INTO command_parse(cmdDisplay, alias, parseType, commandMatch) VALUES (?,?,?,?)`
+		statement, err := db.Prepare(sqlQuery)
+
+		if err != nil {
+			return err
+		}
+		aliasblob, err := json.Marshal(cmdObject.Array[x].Alias)
+		if err != nil {
+			return err
+		}
+		cmdMatchBlob, err := json.Marshal(cmdObject.Array[x].CommandMatch)
+		if err != nil {
+			return err
+		}
+		_, err = statement.Exec(cmdObject.Array[x].CommandName, aliasblob, cmdObject.Array[x].ParseType, cmdMatchBlob)
+		if err != nil {
+			return err
+		}
+		statement.Close()
+
+	}
+	return nil
+}
+
+func RetreiveParseTable(db *sql.DB) (typelib.CommandParseDB, error) {
+	var ParseTable typelib.CommandParseDB
+	sqlQuery := `SELECT cmdDisplay,alias,parseType,commandMatch  FROM command_parse`
+	statement, err := db.Query(sqlQuery)
+	if err != nil {
+		return ParseTable, err
+	}
+	defer statement.Close()
+
+	i := 0
+	for statement.Next() {
+		i++
+		var newParse typelib.CommandTemplate
+		var cmdDisplay string
+		var alias []byte
+		var parseType string
+		var commandMatch []byte
+		statement.Scan(&cmdDisplay, &alias, &parseType, &commandMatch)
+		newParse.CommandName = cmdDisplay
+		newParse.ParseType = parseType
+		err := json.Unmarshal(alias, &newParse.Alias)
+		if err != nil {
+			return ParseTable, err
+		}
+		err = json.Unmarshal(commandMatch, &newParse.CommandMatch)
+		if err != nil {
+			return ParseTable, err
+		}
+		ParseTable.Array = append(ParseTable.Array, newParse)
+
+	}
+	return ParseTable, nil
+
+}
+
 func InsertCreds(db *sql.DB, entry typelib.CredEntry) string {
-	log.Println("Inserting Creds record ...")
 	insertStudentSQL := `INSERT INTO creds(username, domain, password,hash) VALUES (?, ?, ?, ?)`
 	statement, err := db.Prepare(insertStudentSQL) // Prepare statement.
 	// This is good to avoid SQL injections
@@ -153,6 +245,7 @@ func DeleteCred(db *sql.DB, ID int) error {
 	return nil
 }
 
+// TODO Clean this up
 func GetCred(db *sql.DB, ID int) (typelib.CredEntry, error) {
 	var entry typelib.CredEntry
 	query := fmt.Sprintf("SELECT idCred,username,domain,password,hash FROM creds WHERE idCred = %d", ID)
@@ -199,6 +292,7 @@ func UpdateCred(db *sql.DB, entry typelib.CredEntry) error {
 	return nil
 }
 
+//TODO Clean up
 func SetCredBarEntry(db *sql.DB, commmandBarObject typelib.CommandBar) error {
 	query := fmt.Sprintf("SELECT * FROM commandbar WHERE commandID = 1")
 	statement, err := db.Query(query)

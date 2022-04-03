@@ -1,33 +1,23 @@
 package parseinput
 
 import (
-	"encoding/json"
-	"github.com/ilightthings/GED/inital"
+	"database/sql"
+	"github.com/ilightthings/GED/mysql"
 	"github.com/ilightthings/GED/typelib"
 	"regexp"
 	"strings"
 )
 
-func GenerateCommandTemplate() (typelib.CommandTemplate, error) {
-	// TODO store in SQL
-	var commandsDB typelib.CommandTemplate
-
-	err := json.Unmarshal(inital.InputCommandJson, &commandsDB)
-	if err != nil {
-		return nil, err
-	}
-	return commandsDB, nil
-}
-
-func ExtractCommandData(commandString string) (typelib.CredEntry, typelib.HostEntry, error) {
+// Parses the command input string, using the command_parse table in the database
+func ExtractCommandData(commandString string, db *sql.DB) (typelib.CredEntry, typelib.HostEntry, error) {
 	var credentry typelib.CredEntry
 	var hostentry typelib.HostEntry
-	commandsDB, err := GenerateCommandTemplate()
+	commandsDB, err := mysql.RetreiveParseTable(db)
 	if err != nil {
 		return credentry, hostentry, err
 	}
 
-	for _, y := range commandsDB {
+	for _, y := range commandsDB.Array {
 		for z := range y.Alias {
 			credentry.CommandPattern = y.CommandName
 			if strings.Contains(commandString, y.Alias[z]) {

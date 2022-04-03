@@ -1,3 +1,4 @@
+{"commandsArray":
 [
   {
     "CommandName": "smbmap",
@@ -8,21 +9,6 @@
       ["-u", "user"],
       ["-p", "password"],
       ["-d", "domain"]
-    ]
-  },
-  {
-    "CommandName": "crackmapexec",
-    "Alias": ["cme","crackmapexec"],
-    "ParseType": "args",
-    "CommandMatch": [
-      ["-H", "hash"],
-      ["-u", "user"],
-      ["-p", "password"],
-      ["-d", "domain"],
-      ["smb", "host"],
-      ["ldap", "host"],
-      ["mssql", "host"],
-      ["ssh", "host"]
     ]
   },
   {
@@ -61,10 +47,11 @@
       ["(?:/(?P<user>[^:@\\s]+)[^@:]?)","user"],
       ["(?:/[^ ]+:(?P<password>[^@\\s]+))","password"],
       ["(?:/[^ ]+:'(?P<password>[^\\s]+)')","password"],
-      ["(?:-hashes [a-fA-F0-9]{32}?:([a-fA-F0-9]{32}))", "hash"],
+      ["(?:-hashes (?:[a-fA-F0-9]{32})?:([a-fA-F0-9]{32}))", "hash"],
       ["(?:(?::'[^']+')?@(?P<host>[^\\'s]+[\\s]))","host"]
     ]
   }
 
 
 ]
+}

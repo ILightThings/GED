@@ -27,7 +27,7 @@ func main() {
 
 	r.POST("/import-command", func(c *gin.Context) {
 		command := c.PostForm("cred-import")
-		newcred, newhost, err3 := parseinput.ExtractCommandData(command)
+		newcred, newhost, err3 := parseinput.ExtractCommandData(command, sqliteDatabase)
 		if err3 != nil {
 			c.String(500, "Error with host insert:\n "+err3.Error())
 			return

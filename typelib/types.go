@@ -68,7 +68,11 @@ type RegexEntry []struct {
 	RegexPattern string
 }
 
-type CommandTemplate []struct {
+type CommandParseDB struct {
+	Array []CommandTemplate `json:"commandsArray"`
+}
+
+type CommandTemplate struct {
 	CommandName  string     `json:"CommandName"`
 	Alias        []string   `json:"Alias"`
 	ParseType    string     `json:"ParseType"`
