@@ -19,7 +19,7 @@ func FreshInstall(db *sql.DB) error {
 	createCommandTable(db)
 	createCommandParseTable(db)
 	var begin typelib.CommandLibrary
-	begin.ImportFromJson(inital.Commands)
+	begin.ImportFromJson(inital.CommandOutTemplateBytes)
 	err := InsertCommandIntoLib(db, begin)
 	if err != nil {
 		return err
@@ -482,9 +482,11 @@ func InsertCommandIntoLib(db *sql.DB, commandLib typelib.CommandLibrary) error {
 	return nil
 }
 
+//TODO add get single entry, add update single entry, delete single entry
+
 func GetCommandLib(db *sql.DB) (typelib.CommandLibrary, error) {
 	var entries typelib.CommandLibrary
-	rows, err := db.Query("SELECT templateString,displayString,exampleString FROM commands ORDER BY displayString")
+	rows, err := db.Query("SELECT idCommand,templateString,displayString,exampleString FROM commands ORDER BY displayString")
 	defer rows.Close()
 	if err != nil {
 		return typelib.CommandLibrary{}, err
@@ -492,11 +494,13 @@ func GetCommandLib(db *sql.DB) (typelib.CommandLibrary, error) {
 
 	for rows.Next() {
 		var cmd typelib.CommandBuild
+		var ID string
 		var command string
 		var display string
 		var example string
-		rows.Scan(&command, &display, &example)
+		rows.Scan(&ID, &command, &display, &example)
 
+		cmd.ID = ID
 		cmd.Command = command
 		cmd.Display = display
 		cmd.Example = example

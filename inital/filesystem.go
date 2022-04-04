@@ -7,18 +7,19 @@ import (
 )
 
 //go:embed output_command_reference.json
-var Commands []byte
+var CommandOutTemplateBytes []byte
 
 //go:embed input_command_parse.json
-var InputCommandJson []byte
+var InputeParseBytes []byte
 
 func GenerateCommandTemplate() (typelib.CommandParseDB, error) {
-	// TODO store in SQL
 	var commandsDB typelib.CommandParseDB
 
-	err := json.Unmarshal(InputCommandJson, &commandsDB)
+	err := json.Unmarshal(InputeParseBytes, &commandsDB)
 	if err != nil {
 		return commandsDB, err
 	}
 	return commandsDB, nil
 }
+
+//TODO add catagroyies to commands for searching features later.

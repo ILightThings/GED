@@ -29,6 +29,7 @@ type CommandLibrary struct {
 	ListOfCommands []CommandBuild
 }
 type CommandBuild struct {
+	ID      string
 	Command string
 	Example string
 	Display string

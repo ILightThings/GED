@@ -24,22 +24,22 @@
 
         {
           "command":"impacket-psexec ##DOMAIN##/##USER##:'##PASSWORD##'@##HOST##",
-          "display":"Impacket psexec",
+          "display":"Impacket-psexec",
           "example":"impacket-psexec light.local/terry:'password123'@192.168.0.1"
         },
         {
           "command":"impacket-psexec ##DOMAIN##/##USER##:@##HOST## -hashes :##HASH##",
-          "display":"Impacket psexec[H]",
+          "display":"Impacket-psexec[H]",
           "example":"impacket-psexec light.local/terry@192.168.0.1 -hashes :A9FDFA038C4B75EBC76DC855DD74F0DA"
         },
         {
           "command":"impacket-wmiexec ##DOMAIN##/##USER##:'##PASSWORD##'@##HOST##",
-          "display":"Impacket wmiexec",
+          "display":"Impacket-wmiexec",
           "example":"impacket-wmiexec light.local/terry:'password123'@192.168.0.1"
         },
         {
           "command": "impacket-wmiexec ##DOMAIN##/##USER##:@##HOST## -hashes :##HASH##",
-          "display": "Impacket wmiexec[H]",
+          "display": "Impacket-wmiexec[H]",
           "example": "impacket-wmiexec light.local/terry@192.168.0.1 -hashes :A9FDFA038C4B75EBC76DC855DD74F0DA"
         },
         {
@@ -49,22 +49,22 @@
         },
         {
           "command": "nmap ##HOST## -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=##DOMAIN##,smbusername=##USER##,smbpassword=##PASSWORD##'",
-          "display": "nmap enum shares",
+          "display": "Nmap Enum shares",
           "example": "nmap 192.168.0.1 -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=light.local,smbusername=terry,smbpassword=password123"
         },
         {
           "command": "nmap ##HOST## -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=##DOMAIN##,smbusername=##USER##,smbhash=##HASH##'",
-          "display": "nmap enum shares[H]",
+          "display": "Nmap enum shares[H]",
           "example": "nmap 192.168.0.1 -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=light.local,smbusername=terry,smbhash=A9FDFA038C4B75EBC76DC855DD74F0DA"
         },
         {
           "command": "impacket-smbclient ##DOMAIN##/##USER##:'##PASSWORD##'@##HOST##",
-          "display": "Impacket smbclient",
+          "display": "Impacket-smbclient",
           "example": "impacket-smbclient light.local/terry:'password123'@192.168.0.1"
         },
         {
           "command": "impacket-smbclient ##DOMAIN##/##USER##:@##HOST## -hashes :##HASH##",
-          "display": "Impacket smbclient[H]",
+          "display": "Impacket-smbclient[H]",
           "example": "impacket-smbclient light.local/terry@192.168.0.1 -hashes :A9FDFA038C4B75EBC76DC855DD74F0DA"
         },
         {

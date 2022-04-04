@@ -4,10 +4,17 @@ A tool to keep me organized and convert my creds from one format to another. The
 
 
 ## Database
+Installation for windows?
 https://medium.com/@yaravind/go-sqlite-on-windows-f91ef2dacfe
 
 
 ## Todo
+
+Deployment:
+- [ ] Localhost only?
+- [ ] Custom Port 
+- [ ] Custom DB Name
+- [ ] Encrypt Database
 
 Settings:
 - [ ] Add Database rebuild function

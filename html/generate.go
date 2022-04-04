@@ -11,7 +11,7 @@ import (
 
 func GenerateImportPage(db *sql.DB) []byte {
 	var htmtBuffer bytes.Buffer
-	pageData, err := GenerateGeneral(db)
+	pageData, err := GenerateHeaderFooterCmdBar(db)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -25,8 +25,8 @@ func GenerateImportPage(db *sql.DB) []byte {
 
 }
 
-func GenerateCredsTable(db *sql.DB) []byte {
-	page, err := GenerateGeneral(db)
+func GenerateTableCreds(db *sql.DB) []byte {
+	page, err := GenerateHeaderFooterCmdBar(db)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -38,13 +38,13 @@ func GenerateCredsTable(db *sql.DB) []byte {
 
 	//
 	//
-	//tabletempl, err := template.ParseFiles("html/credtable.html")
+	//tabletempl, err := template.ParseFiles("html/table_cred.html")
 	//if err != nil {
 	//	log.Fatal(err)
 	//}
 	//tabletempl.Execute(&htmtBuffer, page)
 
-	var template = template.Must(template.ParseFS(HTML, "header.html", "credtable.html", "footer.html"))
+	var template = template.Must(template.ParseFS(HTML, "header.html", "table_cred.html", "footer.html"))
 	err = template.ExecuteTemplate(&htmtBuffer, "table", page)
 	if err != nil {
 		log.Fatal(err)
@@ -54,13 +54,13 @@ func GenerateCredsTable(db *sql.DB) []byte {
 
 }
 
-func GenerateCredUpdate(db *sql.DB, id int) ([]byte, error) {
+func GenerateUpdateFormCreds(db *sql.DB, id int) ([]byte, error) {
 	var html bytes.Buffer
-	updateTempl, err := template.ParseFS(HTML, "header.html", "updateCred.html", "footer.html")
+	updateTempl, err := template.ParseFS(HTML, "header.html", "updateform_cred.html", "footer.html")
 	if err != nil {
 		return html.Bytes(), err
 	}
-	pagedata, err := GenerateGeneral(db)
+	pagedata, err := GenerateHeaderFooterCmdBar(db)
 	if err != nil {
 		return nil, err
 	}
@@ -78,11 +78,11 @@ func GenerateCredUpdate(db *sql.DB, id int) ([]byte, error) {
 
 }
 
-func GenerateHostUpdate(db *sql.DB, id int) ([]byte, error) {
+func GenerateUpdateFormHost(db *sql.DB, id int) ([]byte, error) {
 	var html bytes.Buffer
-	pagedata, err := GenerateGeneral(db)
-	//updateTempl, err := template.ParseFiles("html/updateHost.html")
-	updateTempl, err := template.ParseFS(HTML, "updateHost.html", "header.html", "footer.html")
+	pagedata, err := GenerateHeaderFooterCmdBar(db)
+	//updateTempl, err := template.ParseFiles("html/updateform_host.html")
+	updateTempl, err := template.ParseFS(HTML, "updateform_host.html", "header.html", "footer.html")
 	if err != nil {
 		return html.Bytes(), err
 	}
@@ -101,7 +101,7 @@ func GenerateHostUpdate(db *sql.DB, id int) ([]byte, error) {
 
 func GenerateSettingsPage(db *sql.DB) []byte {
 	var htmtBuffer bytes.Buffer
-	pageData, _ := GenerateGeneral(db)
+	pageData, _ := GenerateHeaderFooterCmdBar(db)
 	var template = template.Must(template.ParseFS(HTML, "header.html", "setting.html", "footer.html"))
 	err := template.ExecuteTemplate(&htmtBuffer, "settings", pageData)
 	if err != nil {
@@ -110,8 +110,8 @@ func GenerateSettingsPage(db *sql.DB) []byte {
 	return htmtBuffer.Bytes()
 }
 
-func GenerateHostTable(db *sql.DB) ([]byte, error) {
-	page, err := GenerateGeneral(db)
+func GenerateTableHosts(db *sql.DB) ([]byte, error) {
+	page, err := GenerateHeaderFooterCmdBar(db)
 	if err != nil {
 		return nil, err
 	}
@@ -123,13 +123,39 @@ func GenerateHostTable(db *sql.DB) ([]byte, error) {
 
 	//
 	//
-	//tabletempl, err := template.ParseFiles("html/credtable.html")
+	//tabletempl, err := template.ParseFiles("html/table_cred.html")
 	//if err != nil {
 	//	log.Fatal(err)
 	//}
 	//tabletempl.Execute(&htmtBuffer, page)
 
-	var template = template.Must(template.ParseFS(HTML, "header.html", "hosttable.html", "footer.html"))
+	var template = template.Must(template.ParseFS(HTML, "header.html", "table_host.html", "footer.html"))
+	err = template.ExecuteTemplate(&htmtBuffer, "table", page)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return htmtBuffer.Bytes(), nil
+
+}
+
+func GenerateTableCommands(db *sql.DB) ([]byte, error) {
+	// GenerateHeaderFooterCmdBar already get the commands from table so we can reuse it.
+	page, err := GenerateHeaderFooterCmdBar(db)
+	if err != nil {
+		return nil, err
+	}
+	var htmtBuffer bytes.Buffer
+
+	//
+	//
+	//tabletempl, err := template.ParseFiles("html/table_cred.html")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//tabletempl.Execute(&htmtBuffer, page)
+
+	var template = template.Must(template.ParseFS(HTML, "header.html", "table_commands.html", "footer.html"))
 	err = template.ExecuteTemplate(&htmtBuffer, "table", page)
 	if err != nil {
 		log.Fatal(err)
@@ -140,7 +166,7 @@ func GenerateHostTable(db *sql.DB) ([]byte, error) {
 }
 
 //Generate the command bar and command list from SQL list
-func GenerateGeneral(db *sql.DB) (typelib.PageEntries, error) {
+func GenerateHeaderFooterCmdBar(db *sql.DB) (typelib.PageEntries, error) {
 	var pageData typelib.PageEntries
 	var err error
 	pageData.CommanderBar, err = mysql.GetCommandBarEntry(db)

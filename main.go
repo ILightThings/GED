@@ -101,7 +101,7 @@ func main() {
 	})
 
 	r.GET("/creds", func(c *gin.Context) {
-		data := html.GenerateCredsTable(sqliteDatabase)
+		data := html.GenerateTableCreds(sqliteDatabase)
 		c.Data(200, "string", data)
 
 	})
@@ -114,7 +114,7 @@ func main() {
 			return
 		}
 
-		responce, err := html.GenerateCredUpdate(sqliteDatabase, ID)
+		responce, err := html.GenerateUpdateFormCreds(sqliteDatabase, ID)
 		if err != nil {
 			c.String(500, err.Error())
 		}
@@ -225,7 +225,7 @@ func main() {
 	})
 
 	r.GET("/hosts", func(c *gin.Context) {
-		data, err := html.GenerateHostTable(sqliteDatabase)
+		data, err := html.GenerateTableHosts(sqliteDatabase)
 		if err != nil {
 			c.String(500, "Error Generating Host Table:\n"+err.Error())
 		}
@@ -275,12 +275,20 @@ func main() {
 			return
 		}
 
-		responce, err := html.GenerateHostUpdate(sqliteDatabase, ID)
+		responce, err := html.GenerateUpdateFormHost(sqliteDatabase, ID)
 		if err != nil {
 			c.String(500, err.Error())
 			return
 		}
 		c.Data(200, "string", responce)
+	})
+
+	r.GET("/commands", func(c *gin.Context) {
+		data, err := html.GenerateTableCommands(sqliteDatabase)
+		if err != nil {
+			c.String(500, "Error Generating Host Table:\n"+err.Error())
+		}
+		c.Data(200, "string", data)
 	})
 
 	r.POST("/updateHost/:id", func(c *gin.Context) {

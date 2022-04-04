@@ -5,7 +5,7 @@ import (
 	_ "embed"
 )
 
-////go:embed credtable.html
+////go:embed table_cred.html
 //var CredTable string
 //
 ////go:embed footer.html
@@ -14,7 +14,7 @@ import (
 ////go:embed header.html
 //var Header string
 //
-////go:embed hosttable.html
+////go:embed table_host.html
 //var HostTable string
 //
 ////go:embed import.html
@@ -23,10 +23,10 @@ import (
 ////go:embed setting.html
 //var Setting string
 //
-////go:embed updateCred.html
+////go:embed updateform_cred.html
 //var UpdateCred string
 //
-////go:embed updateHost.html
+////go:embed updateform_host.html
 //var UpdateHost string
 
 //go:embed *.html
