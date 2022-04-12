@@ -64,11 +64,6 @@ type ParseOptionsCred struct {
 	DomainList   []string
 }
 
-type RegexEntry []struct {
-	PatternID    string
-	RegexPattern string
-}
-
 type CommandParseDB struct {
 	Array []CommandTemplate `json:"commandsArray"`
 }
@@ -143,10 +138,10 @@ func (customCommand *CommandBuild) BuildCommand(bar CommandBar) string {
 	return start
 }
 
-func (comlib *CommandLibrary) ImportFromJson(cmdJson []byte) error {
+func (commandlibrary *CommandLibrary) ImportFromJson(cmdJson []byte) error {
 	var commandLib []CommandBuild
 	json.Unmarshal([]byte(cmdJson), &commandLib)
-	comlib.ListOfCommands = commandLib
+	commandlibrary.ListOfCommands = commandLib
 	return nil
 
 }
@@ -167,7 +162,7 @@ func (h *HostEntry) Verify() error {
 		if value >= 1 {
 			return nil
 		} else {
-			return errors.New("Empty Entry")
+			return errors.New("empty entry")
 		}
 	}
 }
