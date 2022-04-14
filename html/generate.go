@@ -3,6 +3,7 @@ package html
 import (
 	"bytes"
 	"database/sql"
+	"github.com/ilightthings/GED/mydata"
 	"github.com/ilightthings/GED/mysql"
 	"github.com/ilightthings/GED/typelib"
 	"html/template"
@@ -181,5 +182,30 @@ func GenerateHeaderFooterCmdBar(db *sql.DB) (typelib.PageEntries, error) {
 	}
 
 	return pageData, nil
+
+}
+
+func GenerateExportZip(db *sql.DB) ([]byte, error) {
+
+	// Get Command List
+	exportDatabase, err := GenerateHeaderFooterCmdBar(db)
+	if err != nil {
+		return nil, err
+	}
+	exportDatabase.CredEntries, err = mysql.GetCredTableSQLEntries(db)
+	if err != nil {
+		return nil, err
+	}
+
+	exportDatabase.HostEntries, err = mysql.GetHostList(db)
+	if err != nil {
+		return nil, err
+	}
+
+	zipBytes, err := mydata.DatabaseToZip(exportDatabase)
+	if err != nil {
+		return nil, err
+	}
+	return zipBytes, nil
 
 }

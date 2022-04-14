@@ -33,7 +33,6 @@ func FreshInstall(db *sql.DB) error {
 		return err
 	}
 	return nil
-
 }
 
 // TODO Pass argument for location of new database
@@ -245,11 +244,11 @@ func DeleteCred(db *sql.DB, ID int) error {
 	return nil
 }
 
-// TODO Clean this up
 func GetCred(db *sql.DB, ID int) (typelib.CredEntry, error) {
 	var entry typelib.CredEntry
-	query := fmt.Sprintf("SELECT idCred,username,domain,password,hash FROM creds WHERE idCred = %d", ID)
-	statement, err := db.Query(query)
+	query := `SELECT idCred,username,domain,password,hash FROM creds WHERE idCred = ?`
+	query2, err := db.Prepare(query)
+	statement, err := query2.Query(ID)
 	defer statement.Close()
 	if err != nil {
 		return entry, err
@@ -292,18 +291,18 @@ func UpdateCred(db *sql.DB, entry typelib.CredEntry) error {
 	return nil
 }
 
-//TODO Clean up
 func SetCredBarEntry(db *sql.DB, commmandBarObject typelib.CommandBar) error {
-	query := fmt.Sprintf("SELECT * FROM commandbar WHERE commandID = 1")
-	statement, err := db.Query(query)
+	query := `SELECT * FROM commandbar WHERE commandID = 1`
+	statement, err := db.Prepare(query)
+	doQuery, err := statement.Query()
 	if err != nil {
 		return err
 	}
-	defer statement.Close()
+	defer doQuery.Close()
 
 	//Determine if there is an existing entry, if not create one and return
 	x := 0
-	for statement.Next() {
+	for doQuery.Next() {
 		x++
 	}
 	if x < 1 {

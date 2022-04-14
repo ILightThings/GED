@@ -312,7 +312,23 @@ func main() {
 			c.String(200, "Entry Updated")
 			return
 		}
+	})
 
+	r.GET("/export-entireDB", func(c *gin.Context) {
+		downloadData, err := html.GenerateExportZip(sqliteDatabase)
+		if err != nil {
+			c.String(500, "Could not Generate Download "+err.Error())
+			return
+		} else {
+			//Force browser download
+			c.Header("Content-Disposition", "attachment; filename=database.zip")
+			//Browser download or preview
+			c.Header("Content-Disposition", "inline;filename=database.zip")
+			c.Header("Content-Transfer-Encoding", "binary")
+			c.Header("Cache-Control", "no-cache")
+			c.Data(200, "application/octet-stream", downloadData)
+			return
+		}
 	})
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")

@@ -1,7 +1,14 @@
 {{define "settings"}}
 {{template "header" . }}
 <div class="p-5">
-<button type="button" class="btn btn-danger" onclick="window.location.href='/wipedatabase'">Delete and Build New Database</button>
+    <div class="col">
+        <button type="button" class="btn btn-primary" onclick="window.location.href='/export-entireDB'">Export Database</button>
+    </div>
+    <div class="col">
+        <button type="button" class="btn btn-danger" onclick="window.location.href='/wipedatabase'">Delete and Build New Database</button>
+    </div>
+
+
 </div>
 
 <script>

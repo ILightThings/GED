@@ -1,60 +1,70 @@
 package mydata
 
-// STOP USING THIS YOU FUCK
 import (
+	"archive/zip"
+	"bytes"
 	"encoding/json"
-	"errors"
-	"fmt"
+	"github.com/ilightthings/GED/typelib"
 )
 
-type UserCreds struct {
-	Username         string
-	Password         string
-	Hash             string
-	Domain           string
-	CommandReference string
-	CommandPattern   string
-	UsedAgainst      []string
-	Parsed           bool
+type jsonFile struct {
+	filename     string
+	filecontents []byte
 }
 
-type Hosts struct {
-	IP            string
-	HostName      string
-	Domain        string
-	ImportHistory []string
-}
+//TODO Optomize this function somehow
+func DatabaseToZip(entries typelib.PageEntries) ([]byte, error) {
+	buf := new(bytes.Buffer)
 
-func (u *UserCreds) StringCreds() string {
-	return fmt.Sprintf("User: \"%s\", Domain: \"%s\", Password: \"%s\", Hash: \"%s\", Command Pattern: \"%s\"", u.Username, u.Domain, u.Password, u.Hash, u.CommandPattern)
-}
+	zipWrite := zip.NewWriter(buf)
+	var fileArray []jsonFile
 
-//func (u *UserCreds) VerifyValid() bool {}
-
-func (u *UserCreds) toJSON() ([]byte, error) {
-	b, err := json.Marshal(u)
+	credfile, err := json.Marshal(entries.CredEntries)
 	if err != nil {
 		return nil, err
 	}
-	return b, nil
-
-}
-
-func (u *UserCreds) Verify() error {
-	value := 0
-	if u.Username != "" {
-		value = value + 2
-	}
-	if u.Domain != "" {
-		value = value + 1
-	}
-	if u.Password != "" || u.Hash != "" {
-		value = value + 1
+	credjson := jsonFile{
+		filename:     "creds.json",
+		filecontents: credfile,
 	}
 
-	if value >= 1 {
-		return nil
-	} else {
-		return errors.New("Empty Entry")
+	hostfile, err := json.Marshal(entries.HostEntries)
+	if err != nil {
+		return nil, err
 	}
+	hostjson := jsonFile{
+		filename:     "hosts.json",
+		filecontents: hostfile,
+	}
+
+	cmdfile, err := json.Marshal(entries.CommandList)
+	if err != nil {
+		return nil, err
+	}
+	cmdjson := jsonFile{
+		filename:     "cmds.json",
+		filecontents: cmdfile,
+	}
+	fileArray = append(fileArray, credjson)
+	fileArray = append(fileArray, hostjson)
+	fileArray = append(fileArray, cmdjson)
+
+	for _, file := range fileArray {
+		zipFile, err := zipWrite.Create(file.filename)
+		if err != nil {
+			return nil, err
+		}
+		_, err = zipFile.Write(file.filecontents)
+		if err != nil {
+			return nil, err
+		}
+
+	}
+	err = zipWrite.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+
 }
