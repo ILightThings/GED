@@ -4,7 +4,10 @@
 <table class="table table-striped table-bordered" style="table-layout: fixed;word-wrap: break-word" >
     <thead>
     <tr>
-        <th style="width: min-content" >ID</th>
+        <th style="width: min-content">
+            <button type="button" class="btn btn-primary" onclick="window.location.href='/addCred'">+
+            </button>
+        </th>
         <th style="width: min-content" >Actions</th>
         <th style="width: min-content" >Command</th>
         <th>Username</th>
@@ -23,7 +26,7 @@
         <td class="small">
         <div class="btn-group btn-group-sm">
             <button type="button" class="btn btn-sm btn-primary"  onclick="window.location.href='/updateID/{{.ID}}'" title="Update Entry">U</button>
-            <button type="button" class="btn btn-sm btn-secondary btn-danger " onclick="window.location.href='/deletecred/{{.ID}}'" title="Delete Entry">D</button>
+            <button type="button" class="btn btn-sm btn-secondary btn-danger " onclick="window.location.href='/delete/cred/{{.ID}}'" title="Delete Entry">D</button>
 
         </div>
     </td>
@@ -48,7 +51,7 @@
         var xhttp = new XMLHttpRequest();
         xhttp.open("GET","/SetCred/"+id,false);
         xhttp.send();
-        window.location.href='/creds'
+        window.location.href='/cred'
 
 
 

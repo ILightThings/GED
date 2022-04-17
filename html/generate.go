@@ -209,3 +209,24 @@ func GenerateExportZip(db *sql.DB) ([]byte, error) {
 	return zipBytes, nil
 
 }
+
+func GenerateUpdateCommand(db *sql.DB, id int) ([]byte, error) {
+	var html bytes.Buffer
+	pagedata, err := GenerateHeaderFooterCmdBar(db)
+	//updateTempl, err := template.ParseFiles("html/updateform_host.html")
+	updateTempl, err := template.ParseFS(HTML, "updateform_commands.html", "header.html", "footer.html")
+	if err != nil {
+		return html.Bytes(), err
+	}
+	pagedata.CommandUpdate, err = mysql.GetCMD(db, id)
+	if err != nil {
+		return html.Bytes(), err
+	}
+
+	err = updateTempl.ExecuteTemplate(&html, "updateCMD", pagedata)
+	if err != nil {
+		return nil, err
+	}
+	return html.Bytes(), nil
+
+}

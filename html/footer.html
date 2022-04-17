@@ -2,7 +2,7 @@
 
 
 <div class="fixed-bottom">
-    <form action="/creds/execute" method="post">
+    <form action="/cred/execute" method="post">
         <div class=" row align-items-center g-6 bg-dark pb-3 pl-3 pr-3" >
         <div class="col-auto">
             <label for="Footer-Domain-Input" class="text-white">Domain</label>
@@ -29,7 +29,7 @@
 
                <select name="command" id="Footer-Command-input" class="mt-3">
                {{ range .CommandList }}
-                   <option value="{{ .Command }}">{{ .Display }}</option>
+                   <option value="{{ .Template }}">{{ .Short }}</option>
                    {{end}}
                </select>
         </div>

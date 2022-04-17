@@ -48,14 +48,14 @@
           "example": "runas /user:light.local\\terry cmd"
         },
         {
-          "command": "nmap ##HOST## -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=##DOMAIN##,smbusername=##USER##,smbpassword=##PASSWORD##'",
+          "command": "nmap ##HOST## -p 445,139 --script 'smb-enum-shares' --script-args 'smbdomain=##DOMAIN##,smbusername=##USER##,smbpassword=##PASSWORD##'",
           "display": "Nmap Enum shares",
-          "example": "nmap 192.168.0.1 -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=light.local,smbusername=terry,smbpassword=password123"
+          "example": "nmap 192.168.0.1 -p 445,139 --script 'smb-enum-shares' --script-args 'smbdomain=light.local,smbusername=terry,smbpassword=password123"
         },
         {
-          "command": "nmap ##HOST## -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=##DOMAIN##,smbusername=##USER##,smbhash=##HASH##'",
+          "command": "nmap ##HOST## -p 445,139 --script 'smb-enum-shares' --script-args 'smbdomain=##DOMAIN##,smbusername=##USER##,smbhash=##HASH##'",
           "display": "Nmap enum shares[H]",
-          "example": "nmap 192.168.0.1 -p 445,139 --script 'smb-enum-shares' --script args 'smbdomain=light.local,smbusername=terry,smbhash=A9FDFA038C4B75EBC76DC855DD74F0DA"
+          "example": "nmap 192.168.0.1 -p 445,139 --script 'smb-enum-shares' --script-args 'smbdomain=light.local,smbusername=terry,smbhash=A9FDFA038C4B75EBC76DC855DD74F0DA"
         },
         {
           "command": "impacket-smbclient ##DOMAIN##/##USER##:'##PASSWORD##'@##HOST##",

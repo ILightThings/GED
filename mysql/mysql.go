@@ -12,6 +12,10 @@ import (
 	"os"
 )
 
+const DELETE_HOST = `DELETE FROM hosts WHERE idHost = (?)`
+const DELETE_CRED = `DELETE FROM creds WHERE idCred = (?)`
+const DELETE_COMMAND = `DELETE FROM commands WHERE idCommand = (?)`
+
 func FreshInstall(db *sql.DB) error {
 	createCredTable(db)
 	createHostsTable(db)
@@ -231,9 +235,18 @@ func InsertCreds(db *sql.DB, entry typelib.CredEntry) string {
 	return ""
 }
 
-func DeleteCred(db *sql.DB, ID int) error {
-	deleteStudentSQL := `DELETE FROM creds WHERE idCred = (?)`
-	statement, err := db.Prepare(deleteStudentSQL)
+func DeleteEntry(db *sql.DB, table string, ID int) error {
+	var deleteQuery string
+	switch table {
+	case "host":
+		deleteQuery = DELETE_HOST
+	case "cred":
+		deleteQuery = DELETE_CRED
+	case "command":
+		deleteQuery = DELETE_COMMAND
+	}
+
+	statement, err := db.Prepare(deleteQuery)
 	if err != nil {
 		return err
 	}
@@ -354,44 +367,6 @@ func SetCredBarEntry(db *sql.DB, commmandBarObject typelib.CommandBar) error {
 			return nil
 		}
 
-		/*var commands []string
-		statement := 0
-		if commmandBarObject.User != "" {
-			statement++
-			commands = append(commands, fmt.Sprintf("user='%s'", commmandBarObject.User))
-		}
-		if commmandBarObject.Domain != "" {
-			statement++
-			commands = append(commands, fmt.Sprintf("domain='%s'", commmandBarObject.Domain))
-		}
-		if commmandBarObject.Password != "" {
-			statement++
-			commands = append(commands, fmt.Sprintf("password='%s' ", commmandBarObject.Password))
-		}
-		if commmandBarObject.Hash != "" {
-			statement++
-			commands = append(commands, fmt.Sprintf("hash='%s'", commmandBarObject.Hash))
-		}
-		if commmandBarObject.Host != "" {
-			statement++
-			commands = append(commands, fmt.Sprintf("host='%s'", commmandBarObject.Host))
-		}
-		if commmandBarObject.Command != "" {
-			statement++
-			commands = append(commands, fmt.Sprintf("command = '%s'", commmandBarObject.User))
-		}
-		if statement < 1 {
-			return errors.New("empty query. Aborting")
-		} else {
-			preupdate := strings.Join(commands, ",")
-			updateStatment = updateStatment + preupdate + "WHERE commandID=1"
-			_, err := db.Exec(updateStatment)
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil*/
 	}
 }
 
@@ -470,8 +445,8 @@ func InsertCommandIntoLib(db *sql.DB, commandLib typelib.CommandLibrary) error {
 			return err
 		}
 
-		_, err = statement.Exec(commandLib.ListOfCommands[x].Command,
-			commandLib.ListOfCommands[x].Display,
+		_, err = statement.Exec(commandLib.ListOfCommands[x].Template,
+			commandLib.ListOfCommands[x].Short,
 			commandLib.ListOfCommands[x].Example)
 		if err != nil {
 			return err
@@ -481,11 +456,11 @@ func InsertCommandIntoLib(db *sql.DB, commandLib typelib.CommandLibrary) error {
 	return nil
 }
 
-//TODO add get single entry, add update single entry, delete single entry
+//TODO, delete single entry
 
 func GetCommandLib(db *sql.DB) (typelib.CommandLibrary, error) {
 	var entries typelib.CommandLibrary
-	rows, err := db.Query("SELECT idCommand,templateString,displayString,exampleString FROM commands ORDER BY displayString")
+	rows, err := db.Query("SELECT idCommand,templateString,displayString,exampleString FROM commands")
 	defer rows.Close()
 	if err != nil {
 		return typelib.CommandLibrary{}, err
@@ -500,8 +475,8 @@ func GetCommandLib(db *sql.DB) (typelib.CommandLibrary, error) {
 		rows.Scan(&ID, &command, &display, &example)
 
 		cmd.ID = ID
-		cmd.Command = command
-		cmd.Display = display
+		cmd.Template = command
+		cmd.Short = display
 		cmd.Example = example
 
 		entries.ListOfCommands = append(entries.ListOfCommands, cmd)
@@ -556,20 +531,6 @@ func GetHostList(db *sql.DB) ([]typelib.HostEntry, error) {
 	return hostlists, nil
 }
 
-func DeleteHost(db *sql.DB, ID int) error {
-	deleteStudentSQL := `DELETE FROM hosts WHERE idHost = (?)`
-	statement, err := db.Prepare(deleteStudentSQL)
-	defer statement.Close()
-	if err != nil {
-		return err
-	}
-	_, err = statement.Exec(ID)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func GetHost(db *sql.DB, ID int) (typelib.HostEntry, error) {
 	var entry typelib.HostEntry
 	query := `SELECT idHost,IP,FQDN,Hostname FROM hosts WHERE idHost = (?)`
@@ -613,6 +574,74 @@ func UpdateHost(db *sql.DB, entry typelib.HostEntry) error {
 		return err
 	}
 	_, err = updateStatement.Exec(entry.IP, entry.FQDN, entry.Hostname, entry.ID)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func AddBlankHost(db *sql.DB) (entryNumber int, err error) {
+	insertHostSQL := `INSERT INTO hosts(ip, hostname, fqdn,usersAdmin) VALUES (?, ?, ?, ?)`
+	statement, err := db.Prepare(insertHostSQL) // Prepare statement.
+	defer statement.Close()
+	// This is good to avoid SQL injections
+	if err != nil {
+		return 0, err
+	}
+	id, err := statement.Exec("", "", "", "")
+	if err != nil {
+		return 0, err
+	}
+	num, _ := id.LastInsertId()
+
+	return int(num), nil
+
+}
+
+func GetCMD(db *sql.DB, ID int) (typelib.CommandBuild, error) {
+	var entry typelib.CommandBuild
+	query := `SELECT idCommand,displayString,templateString,exampleString FROM commands WHERE idCommand = (?)`
+	statement, err := db.Prepare(query)
+	defer statement.Close()
+	rows, err := statement.Query(ID)
+	defer rows.Close()
+
+	if err != nil {
+		return entry, err
+	}
+	// Make sure entry is not zero
+	i := 0
+	for rows.Next() {
+		i++
+		var idCommand string
+		var displayString string
+		var templateString string
+		var exampleString string
+		rows.Scan(&idCommand, &displayString, &templateString, &exampleString)
+		entry.ID = idCommand
+		entry.Template = templateString
+		entry.Example = exampleString
+		entry.Short = displayString
+
+		return entry, nil
+	}
+	if i == 0 {
+		return entry, errors.New("no entries found")
+	}
+	return entry, errors.New("could not build command object")
+
+}
+
+func UpdateCMD(db *sql.DB, entry typelib.CommandBuild) error {
+	// TODO implement history
+	updateCommand := `UPDATE commands SET displayString = ?,templateString = ?,exampleString = ? WHERE idCommand = ?`
+	updateStatement, err := db.Prepare(updateCommand)
+	defer updateStatement.Close()
+	if err != nil {
+		return err
+	}
+	_, err = updateStatement.Exec(entry.Short, entry.Template, entry.Example, entry.ID)
 
 	if err != nil {
 		return err

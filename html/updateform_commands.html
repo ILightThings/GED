@@ -1,0 +1,39 @@
+{{define "updateCMD"}}
+
+{{template "header" .}}
+
+<div class="p-5 ">
+<form action="/updateCommand/{{.CommandUpdate.ID}}" method="post" class="p-4 border border-primary rounded">
+    <div class="form-group row">
+        <label class="col-4 col-form-label" for="ID">ID</label>
+        <div class="col-8">
+            <input id="ID" name="ID" type="text" class="form-control" readonly value="{{ .CommandUpdate.ID}}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="Short" class="col-4 col-form-label">ShortHand</label>
+        <div class="col-8">
+            <input id="Short" name="Short" type="text" class="form-control" value="{{ .CommandUpdate.Short}}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="Template" class="col-4 col-form-label">Template</label>
+        <div class="col-8">
+            <input id="Template" name="Template" type="text" class="form-control" value="{{ .CommandUpdate.Template}}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="Example" class="col-4 col-form-label">Example</label>
+        <div class="col-8">
+            <input id="Example" name="Example" type="text" class="form-control" value="{{ .CommandUpdate.Example}}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="offset-4 col-8">
+            <button name="submit" type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+</form>
+</div>
+{{template "footer" . }}
+{{end}}

@@ -84,23 +84,23 @@ func main() {
 
 	})
 
-	r.GET("/deletecred/:id", func(c *gin.Context) {
+	r.GET("/delete/:table/:id", func(c *gin.Context) {
 		idofcred, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			c.String(500, "ID is not int")
 			return
 		}
-		err = mysql.DeleteCred(sqliteDatabase, idofcred)
+		err = mysql.DeleteEntry(sqliteDatabase, (c.Param("table")), idofcred)
 		if err != nil {
 			c.String(500, "Could not Delete: "+err.Error())
 		} else {
-			c.Redirect(301, "/creds")
+			c.Redirect(301, "/"+c.Param("table"))
 			return
 		}
 
 	})
 
-	r.GET("/creds", func(c *gin.Context) {
+	r.GET("/cred", func(c *gin.Context) {
 		data := html.GenerateTableCreds(sqliteDatabase)
 		c.Data(200, "string", data)
 
@@ -151,7 +151,7 @@ func main() {
 
 	})
 
-	r.GET("/creds/json/:id", func(c *gin.Context) {
+	r.GET("/cred/json/:id", func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			c.String(500, "ID is not a number")
@@ -202,7 +202,7 @@ func main() {
 
 	})
 
-	r.POST("/creds/execute", func(c *gin.Context) {
+	r.POST("/cred/execute", func(c *gin.Context) {
 		var passedCommands typelib.CommandBar
 		var newCommand typelib.CommandBuild
 		passedCommands.User = c.PostForm("footer-user")
@@ -211,7 +211,7 @@ func main() {
 		passedCommands.Hash = c.PostForm("footer-hash")
 		passedCommands.Host = c.PostForm("footer-host")
 		passedCommands.Command = c.PostForm("command")
-		newCommand.Command = c.PostForm("command")
+		newCommand.Template = c.PostForm("command")
 
 		err := mysql.SetCredBarEntry(sqliteDatabase, passedCommands)
 		if err != nil {
@@ -224,12 +224,26 @@ func main() {
 
 	})
 
-	r.GET("/hosts", func(c *gin.Context) {
+	r.GET("/host", func(c *gin.Context) {
 		data, err := html.GenerateTableHosts(sqliteDatabase)
 		if err != nil {
 			c.String(500, "Error Generating Host Table:\n"+err.Error())
 		}
 		c.Data(200, "string", data)
+	})
+
+	r.GET("/addHost", func(c *gin.Context) {
+		ID, err := mysql.AddBlankHost(sqliteDatabase)
+		if err != nil {
+			c.String(500, err.Error())
+		}
+
+		responce, err := html.GenerateUpdateFormHost(sqliteDatabase, ID)
+		if err != nil {
+			c.String(500, err.Error())
+		}
+		c.Data(200, "string", responce)
+
 	})
 
 	r.GET("/setHost/:id", func(c *gin.Context) {
@@ -251,22 +265,6 @@ func main() {
 
 	})
 
-	r.GET("/deleteHost/:id", func(c *gin.Context) {
-		idofcred, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			c.String(500, "ID is not int")
-			return
-		}
-		err = mysql.DeleteHost(sqliteDatabase, idofcred)
-		if err != nil {
-			c.String(500, "Could not Delete: "+err.Error())
-		} else {
-			c.Redirect(301, "/hosts")
-			return
-		}
-
-	})
-
 	r.GET("/updateHost/:id", func(c *gin.Context) {
 
 		ID, err := strconv.Atoi(c.Param("id"))
@@ -283,7 +281,7 @@ func main() {
 		c.Data(200, "string", responce)
 	})
 
-	r.GET("/commands", func(c *gin.Context) {
+	r.GET("/command", func(c *gin.Context) {
 		data, err := html.GenerateTableCommands(sqliteDatabase)
 		if err != nil {
 			c.String(500, "Error Generating Host Table:\n"+err.Error())
@@ -327,6 +325,47 @@ func main() {
 			c.Header("Content-Transfer-Encoding", "binary")
 			c.Header("Cache-Control", "no-cache")
 			c.Data(200, "application/octet-stream", downloadData)
+			return
+		}
+	})
+
+	r.GET("/updateCommand/:id", func(c *gin.Context) {
+
+		ID, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.String(500, "ID is not a number")
+			return
+		}
+
+		responce, err := html.GenerateUpdateCommand(sqliteDatabase, ID)
+		if err != nil {
+			c.String(500, err.Error())
+		}
+		c.Data(200, "string", responce)
+	})
+
+	r.POST("/updateCommand/:id", func(c *gin.Context) {
+		var updateCmdObj typelib.CommandBuild
+		var err error
+		if err != nil {
+			c.String(500, "ID is not a number")
+			return
+		}
+		err = c.ShouldBind(&updateCmdObj)
+		if err != nil {
+			c.String(500, "Could not bind JSON\n"+err.Error())
+			return
+		}
+
+		updateCmdObj.Template = strings.ReplaceAll(updateCmdObj.Template, "\\n", "\n")
+		updateCmdObj.Example = strings.ReplaceAll(updateCmdObj.Example, "\\n", "\n")
+
+		err = mysql.UpdateCMD(sqliteDatabase, updateCmdObj)
+		if err != nil {
+			c.String(500, "Could not update Database Entry "+err.Error())
+			return
+		} else {
+			c.String(200, "Entry Updated")
 			return
 		}
 	})

@@ -8,12 +8,13 @@ import (
 )
 
 type PageEntries struct {
-	CredEntries  []CredEntry
-	CommanderBar CommandBar
-	CommandList  []CommandBuild
-	HostEntries  []HostEntry
-	CredUpdate   CredEntry
-	HostUpdate   HostEntry
+	CredEntries   []CredEntry
+	CommanderBar  CommandBar
+	CommandList   []CommandBuild
+	HostEntries   []HostEntry
+	CredUpdate    CredEntry
+	HostUpdate    HostEntry
+	CommandUpdate CommandBuild
 }
 
 type CommandBar struct {
@@ -29,10 +30,10 @@ type CommandLibrary struct {
 	ListOfCommands []CommandBuild
 }
 type CommandBuild struct {
-	ID      string
-	Command string
-	Example string
-	Display string
+	ID       string
+	Template string // ##USER##
+	Example  string // terry
+	Short    string // Shorthand
 }
 
 type CredEntry struct {
@@ -129,7 +130,7 @@ func (c *CommandBar) Prepare() error {
 
 //TODO build a CommandBuild HTML page and CommandBuild Builder similar to user update
 func (customCommand *CommandBuild) BuildCommand(bar CommandBar) string {
-	start := customCommand.Command
+	start := customCommand.Template
 	start = strings.ReplaceAll(start, "##USER##", bar.User)
 	start = strings.ReplaceAll(start, "##PASSWORD##", bar.Password)
 	start = strings.ReplaceAll(start, "##HASH##", bar.Hash)

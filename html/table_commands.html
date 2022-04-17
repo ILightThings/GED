@@ -5,8 +5,12 @@
     <tr><i>*[H] = Hash Version where available</i></tr>
     <thead>
     <tr>
+        <th style="width: min-content">
+            <button type="button" class="btn btn-primary" onclick="window.location.href='/addCommand'">+
+            </button>
+        </th>
         <th style="width: min-content">Actions</th>
-        <th>Command</th>
+        <th>Short</th>
         <th>Template</th>
         <th>Example</th>
     </tr>
@@ -15,20 +19,21 @@
     {{range .CommandList}}
 
     <tr>
+        <td>{{ .ID}}</td>
 
         <td class="small">
             <div class="btn-group btn-group-sm">
                 <button type="button" class="btn btn-sm btn-primary"  onclick="window.location.href='/updateCommand/{{.ID}}'" title="Update Entry">U</button>
-                <button type="button" class="btn btn-sm btn-secondary btn-danger " onclick="window.location.href='/deleteCommand/{{.ID}}'" title="Delete Entry">D</button>
+                <button type="button" class="btn btn-sm btn-secondary btn-danger " onclick="window.location.href='/delete/command/{{.ID}}'" title="Delete Entry">D</button>
 
             </div>
         </td>
         <td >
 
-            {{ .Display}}
+            {{ .Short}}
         </td>
         <td>
-            <pre><code>{{ .Command}}</code></pre>
+            <pre><code>{{ .Template}}</code></pre>
             </td>
         <td>
 
@@ -47,7 +52,7 @@
         var xhttp = new XMLHttpRequest();
         xhttp.open("GET","/setHost/"+id,false);
         xhttp.send();
-        window.location.href='/hosts'
+        window.location.href='/host'
     }
 </script>
 </div>
