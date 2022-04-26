@@ -3,11 +3,12 @@ package html
 import (
 	"bytes"
 	"database/sql"
+	"html/template"
+	"log"
+
 	"github.com/ilightthings/GED/mydata"
 	"github.com/ilightthings/GED/mysql"
 	"github.com/ilightthings/GED/typelib"
-	"html/template"
-	"log"
 )
 
 func GenerateImportPage(db *sql.DB) []byte {
@@ -227,6 +228,31 @@ func GenerateUpdateCommand(db *sql.DB, id int) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	return html.Bytes(), nil
+
+}
+
+func GenerateUpdateCred(db *sql.DB, id int) ([]byte, error) {
+	var html bytes.Buffer
+	pagedata, err := GenerateHeaderFooterCmdBar(db)
+	if err != nil {
+		return html.Bytes(), err
+	}
+	//updateTempl, err := template.ParseFiles("html/updateform_host.html")
+	updateTempl, err := template.ParseFS(HTML, "updateform_cred.html", "header.html", "footer.html")
+	if err != nil {
+		return html.Bytes(), err
+	}
+	pagedata.CredUpdate, err = mysql.GetCred(db, id)
+	if err != nil {
+		return html.Bytes(), err
+	}
+
+	err = updateTempl.ExecuteTemplate(&html, "updateCred", pagedata)
+	if err != nil {
+		return nil, err
+	}
+
 	return html.Bytes(), nil
 
 }
