@@ -86,5 +86,10 @@
           "command": "net user /add ##USER## ##PASSWORD## /Y && net localgroup administrators /add ##USER## ",
           "display": "[CMD] Net Create Local Admin",
           "example": "net user /add terry password123 /Y && net localgroup administrators /add terry /Y"
-        }
+        },
+    {
+      "command": "bloodhound-python -u ##USER## -p ##PASSWORD## -d ##DOMAIN##  ",
+      "display": "Bloodhound-python",
+      "example": "bloodhound-python -u terry -p password123 -d light.local"
+    }
   ]

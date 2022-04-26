@@ -3,15 +3,16 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/ilightthings/GED/html"
 	"github.com/ilightthings/GED/mysql"
 	"github.com/ilightthings/GED/parseinput"
 	"github.com/ilightthings/GED/typelib"
 	_ "github.com/mattn/go-sqlite3"
-	"os"
-	"strconv"
-	"strings"
 )
 
 func main() {
@@ -368,6 +369,34 @@ func main() {
 			c.String(200, "Entry Updated")
 			return
 		}
+	})
+
+	r.GET("/addCommand", func(c *gin.Context) {
+		ID, err := mysql.AddBlankCommand(sqliteDatabase)
+		if err != nil {
+			c.String(500, err.Error())
+		}
+
+		responce, err := html.GenerateUpdateCommand(sqliteDatabase, ID)
+		if err != nil {
+			c.String(500, err.Error())
+		}
+		c.Data(200, "string", responce)
+
+	})
+
+	r.GET("/addCred", func(c *gin.Context) {
+		ID, err := mysql.AddBlankCred(sqliteDatabase)
+		if err != nil {
+			c.String(500, err.Error())
+		}
+
+		responce, err := html.GenerateUpdateCred(sqliteDatabase, ID)
+		if err != nil {
+			c.String(500, err.Error())
+		}
+		c.Data(200, "string", responce)
+
 	})
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")

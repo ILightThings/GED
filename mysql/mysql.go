@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/ilightthings/GED/inital"
 	"github.com/ilightthings/GED/typelib"
 	_ "github.com/mattn/go-sqlite3"
-	"log"
-	"os"
 )
 
 const DELETE_HOST = `DELETE FROM hosts WHERE idHost = (?)`
@@ -647,6 +648,43 @@ func UpdateCMD(db *sql.DB, entry typelib.CommandBuild) error {
 		return err
 	}
 	return nil
+}
+
+func AddBlankCommand(db *sql.DB) (entryNumber int, err error) {
+	insertHostSQL := `INSERT INTO commands(displayString,templateString,exampleString) VALUES (?, ?, ?)`
+	statement, err := db.Prepare(insertHostSQL) // Prepare statement.
+	defer statement.Close()
+	// This is good to avoid SQL injections
+	if err != nil {
+		return 0, err
+	}
+	id, err := statement.Exec("", "", "")
+	if err != nil {
+		return 0, err
+	}
+	num, _ := id.LastInsertId()
+
+	return int(num), nil
+
+}
+
+func AddBlankCred(db *sql.DB) (entryNumber int, err error) {
+	insertHostSQL := `INSERT INTO creds(username,password) VALUES (?, ?)`
+	statement, err := db.Prepare(insertHostSQL) // Prepare statement.
+	if err != nil {
+		return 0, err
+	}
+	defer statement.Close()
+	// This is good to avoid SQL injections
+
+	id, err := statement.Exec("", "")
+	if err != nil {
+		return 0, err
+	}
+	num, _ := id.LastInsertId()
+
+	return int(num), nil
+
 }
 
 //Command
